@@ -1,0 +1,22 @@
+﻿<Application x:Class="Store.Application"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Store"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Стилизация на текста с крайната цена за плащане -->
+        <Style x:Key="TotalTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#FF1F37A4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <!--<Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="White"
+                                      ShadowDepth="1"
+                                      BlurRadius="1"/>
+                </Setter.Value>
+            </Setter>-->
+        </Style>
+        <!-- END Стилизация на текста с крайната цена за плащане -->
+    </Application.Resources>
+</Application>
