@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rooms>
+	<Room low="99" high="119" out="59">DBL</Room>
+	<Room low="119" high="149" out="79">DBLSV</Room>
+	<Room low="109" high="139" out="69">DBLsSV</Room>
+	<Room low="0" high="0" out="0">----</Room>
+	<Room low="99" high="119" out="69">SNGL</Room>
+	<Room low="119" high="149" out="79">SNGLSV</Room>
+	<Room low="119" high="149" out="79">SNGLsSV</Room>
+</Rooms>
