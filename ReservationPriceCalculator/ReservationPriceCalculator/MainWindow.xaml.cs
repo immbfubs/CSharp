@@ -31,12 +31,32 @@ namespace TotalAmount
             InitializeComponent();
             DataContext = this;
             LoadRoomTypes();
-            List<string> keyList = new List<string>(rooms.Keys);
             cbQuantity.ItemsSource = arr.ToArray();
-            cbName.ItemsSource = keyList;
-            Test();
+            #region
+            //can set ItemSource directly to rooms.Keys since it returns a collection
+            //List<string> keyList = new List<string>(rooms.Keys);
+            cbName.ItemsSource = rooms.Keys;
+            #endregion
         }
 
+        //Hides zero columns 
+        public void HideZeroValues(bool[] isZero)
+        {
+            Style hidden = new Style { TargetType = typeof(TextBlock) };
+            Style visible = new Style { TargetType = typeof(TextBlock) };
+
+            visible.Setters.Add(new Setter(TextBlock.VisibilityProperty, Visibility.Visible));
+            hidden.Setters.Add(new Setter(TextBlock.VisibilityProperty, Visibility.Hidden));
+
+            if (isZero[0]) this.Resources["Out"] = hidden;
+                else this.Resources["Out"] = visible;
+            if (isZero[1]) this.Resources["Low"] = hidden;
+                else this.Resources["Low"] = visible;
+            if (isZero[2]) this.Resources["High"] = hidden;
+                else this.Resources["High"] = visible;
+        }
+
+        //Loading room types and prices from the file into rooms dictionary
         private void LoadRoomTypes()
         {
             var types = from i in xDoc.Descendants("Room")
@@ -57,19 +77,7 @@ namespace TotalAmount
             }
         }
 
-        void Test()
-        {
-            //Item itm = new Item
-            //{
-            //    Name = cbName.SelectedValue.ToString(),
-            //    Quantity = (int)cbQuantity.SelectedValue,
-            //    CheckInDate = new DateTime(2019, 10, 13),
-            //    CheckOutDate = new DateTime(2019, 10, 17),
-            //};
-            //itm.Days();
-            //MessageBox.Show(itm.Quantity.ToString());
-        }
-
+        //btnAdd_Click invokes this method which checks if the selected period is valid
         private bool IsCorrectPeriodPicked()
         {
             if (dpCheckIn.SelectedDate != null && dpCheckOut.SelectedDate != null)
@@ -78,6 +86,18 @@ namespace TotalAmount
             }
             MessageBox.Show("Датите нещо не ме кефят");
             return false;
+        }
+
+        private void dpCheckIn_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dpCheckOut.SelectedDate == null)
+            {
+                dpCheckOut.SelectedDate = ((DateTime)dpCheckIn.SelectedDate).AddDays(1);
+            }
+            else if (((DateTime)dpCheckIn.SelectedDate).CompareTo((DateTime)dpCheckOut.SelectedDate) >= 0)
+            {
+                dpCheckOut.SelectedDate = ((DateTime)dpCheckIn.SelectedDate).AddDays(1);
+            }
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -94,18 +114,6 @@ namespace TotalAmount
             }
         }
 
-        private void dpCheckIn_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (dpCheckOut.SelectedDate == null)
-            {
-                dpCheckOut.SelectedDate = ((DateTime)dpCheckIn.SelectedDate).AddDays(1);
-            }
-            else if (((DateTime)dpCheckIn.SelectedDate).CompareTo((DateTime)dpCheckOut.SelectedDate) >= 0)
-            {
-                dpCheckOut.SelectedDate = ((DateTime)dpCheckIn.SelectedDate).AddDays(1);
-            }
-        }
-
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             if(lBox.SelectedIndex != -1)
@@ -113,6 +121,16 @@ namespace TotalAmount
                 Reservation.RemoveAt(lBox.SelectedIndex);
                 Reservation.TotalRefresh();
             }
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            int j = lBox.Items.Count;
+            for (int i = 0; i < j; i++)
+            {
+                Reservation.RemoveAt(0);
+            }
+            Reservation.TotalRefresh();
         }
     }
 }

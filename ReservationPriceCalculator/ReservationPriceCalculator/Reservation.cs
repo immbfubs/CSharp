@@ -25,16 +25,25 @@ namespace TotalAmount
             }
             if (newItem) this.Add(itm);
             TotalRefresh();
+
         }
 
+        //This method also looks after the empty pirce columns and hides them
         public void TotalRefresh()
         {
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+
             this.Total = 0;
+            bool[] priceIsZero = { true, true, true};
             foreach (Item i in this)
             {
                 this.Total += i.Price[3];
+                if (i.Days[0] != 0) priceIsZero[0] = false;
+                if (i.Days[1] != 0) priceIsZero[1] = false;
+                if (i.Days[2] != 0) priceIsZero[2] = false;
             }
-            ((MainWindow)Application.Current.MainWindow).TbTotal.Text = this.Total.ToString();
+            mainWindow.TbTotal.Text = this.Total.ToString();
+            mainWindow.HideZeroValues(priceIsZero);
         }
     }
 }

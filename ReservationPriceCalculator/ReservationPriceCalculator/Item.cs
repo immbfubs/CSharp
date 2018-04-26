@@ -44,7 +44,7 @@ namespace TotalAmount
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Price)));
             }
         }
-        public double[] Days { get; set; } = new double[4];
+        public int[] Days { get; set; } = new int[4];
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
 
@@ -84,62 +84,62 @@ namespace TotalAmount
                 if(a == b)
                 {
                     if (a == 3) a = 1;
-                    Days[a] = Math.Round((CheckOutDate - CheckInDate).TotalHours) / 24;
-                    arri[a] = (decimal)Days[a] * MainWindow.rooms[this.Name][a];
+                    Days[a] = (int)(Math.Round((CheckOutDate - CheckInDate).TotalHours) / 24);
+                    arri[a] = Days[a] * MainWindow.rooms[this.Name][a];
                 }
                 else if(a == 0 && b == 1)
                 {
-                    Days[0] = Math.Round((date1 - CheckInDate).TotalHours) / 24;
-                    arri[0] = (decimal)Days[0] * MainWindow.rooms[this.Name][0];
-                    Days[1] = Math.Round((CheckOutDate - date1).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[0] = (int)(Math.Round((date1 - CheckInDate).TotalHours) / 24);
+                    arri[0] = Days[0] * MainWindow.rooms[this.Name][0];
+                    Days[1] = (int)(Math.Round((CheckOutDate - date1).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
                 }
                 else if (a == 1 && b == 2)
                 {
-                    Days[1] = Math.Round((date2 - CheckInDate).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
-                    Days[2] = Math.Round((CheckOutDate - date2).TotalHours) / 24;
-                    arri[2] = (decimal)Days[2] * MainWindow.rooms[this.Name][2];
+                    Days[1] = (int)(Math.Round((date2 - CheckInDate).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[2] = (int)(Math.Round((CheckOutDate - date2).TotalHours) / 24);
+                    arri[2] = Days[2] * MainWindow.rooms[this.Name][2];
                 }
                 else if (a == 2 && b == 3)
                 {
-                    Days[2] = Math.Round((date3 - CheckInDate).TotalHours) / 24;
-                    arri[2] = (decimal)Days[2] * MainWindow.rooms[this.Name][2];
-                    Days[1] = Math.Round((CheckOutDate - date3).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[2] = (int)(Math.Round((date3 - CheckInDate).TotalHours) / 24);
+                    arri[2] = Days[2] * MainWindow.rooms[this.Name][2];
+                    Days[1] = (int)(Math.Round((CheckOutDate - date3).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
                 }
                 else if (a == 3 && b == 0)
                 {
-                    Days[1] = Math.Round((date4 - CheckInDate).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
-                    Days[0] = Math.Round((CheckOutDate - date4).TotalHours) / 24;
-                    arri[0] = (decimal)Days[0] * MainWindow.rooms[this.Name][0];
+                    Days[1] = (int)(Math.Round((date4 - CheckInDate).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[0] = (int)(Math.Round((CheckOutDate - date4).TotalHours) / 24);
+                    arri[0] = Days[0] * MainWindow.rooms[this.Name][0];
                 }
                 else if (a == 0 && b == 2)
                 {
-                    Days[0] = Math.Round((CheckInDate - date1).TotalHours) / 24;
-                    arri[0] = (decimal)Days[0] * MainWindow.rooms[this.Name][0];
-                    Days[1] = Math.Round((date2 - date1).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
-                    Days[2] = Math.Round((CheckOutDate - date2).TotalHours) / 24;
-                    arri[2] = (decimal)Days[2] * MainWindow.rooms[this.Name][2];
+                    Days[0] = (int)(Math.Round((CheckInDate - date1).TotalHours) / 24);
+                    arri[0] = Days[0] * MainWindow.rooms[this.Name][0];
+                    Days[1] = (int)(Math.Round((date2 - date1).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[2] = (int)(Math.Round((CheckOutDate - date2).TotalHours) / 24);
+                    arri[2] = Days[2] * MainWindow.rooms[this.Name][2];
                 }
                 else if (a == 1 && b == 3)
                 {
-                    Days[1] = Math.Round((date2 - CheckInDate).TotalHours) / 24;
-                    Days[2] = Math.Round((date3 - date2).TotalHours) / 24;
-                    arri[2] = (decimal)Days[2] * MainWindow.rooms[this.Name][2];
-                    Days[1] += Math.Round((CheckOutDate - date3).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[1] = (int)(Math.Round((date2 - CheckInDate).TotalHours) / 24);
+                    Days[2] = (int)(Math.Round((date3 - date2).TotalHours) / 24);
+                    arri[2] = Days[2] * MainWindow.rooms[this.Name][2];
+                    Days[1] += (int)(Math.Round((CheckOutDate - date3).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
                 }
                 else if (a == 2 && b == 0)
                 {
-                    Days[2] = Math.Round((date2 - CheckInDate).TotalHours) / 24;
-                    arri[2] = (decimal)Days[2] * MainWindow.rooms[this.Name][2];
-                    Days[1] = Math.Round((date4 - date3).TotalHours) / 24;
-                    arri[1] = (decimal)Days[1] * MainWindow.rooms[this.Name][1];
-                    Days[0] = Math.Round((CheckOutDate - date4).TotalHours) / 24;
-                    arri[0] = (decimal)Days[0] * MainWindow.rooms[this.Name][0];
+                    Days[2] = (int)(Math.Round((date3 - CheckInDate).TotalHours) / 24);
+                    arri[2] = Days[2] * MainWindow.rooms[this.Name][2];
+                    Days[1] = (int)(Math.Round((date4 - date3).TotalHours) / 24);
+                    arri[1] = Days[1] * MainWindow.rooms[this.Name][1];
+                    Days[0] = (int)(Math.Round((CheckOutDate - date4).TotalHours) / 24);
+                    arri[0] = Days[0] * MainWindow.rooms[this.Name][0];
                 }
                 arri[0] *= this.quantity;
                 arri[1] *= this.quantity;
