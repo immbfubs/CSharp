@@ -70,11 +70,6 @@ namespace TotalAmount
             DateTime date2 = new DateTime(CheckInDate.Year, mainWindow.dates[2, 0], mainWindow.dates[2, 1]);
             DateTime date3 = new DateTime(CheckInDate.Year, mainWindow.dates[3, 0], mainWindow.dates[3, 1]);
 
-            MessageBox.Show(date0.ToString());
-            MessageBox.Show(date1.ToString());
-            MessageBox.Show(date2.ToString());
-            MessageBox.Show(date3.ToString());
-
             //Determine in which tourist seassons are Check-In and Check-Out dates
             if (CheckInDate.CompareTo(date0) < 0) a = 0;
             else if (CheckInDate.CompareTo(date1) < 0) a = 1;
