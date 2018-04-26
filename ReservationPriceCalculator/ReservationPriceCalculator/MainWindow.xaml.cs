@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,22 +22,113 @@ namespace TotalAmount
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static XDocument xDoc = XDocument.Load(App.settingsXml);
+        public static XDocument xDoc;
         public static Dictionary<string, decimal[]> rooms = new Dictionary<string, decimal[]>();
+        public int[,] dates = new int[10,2];
         public Reservation Reservation { get; } = new Reservation();
 
         public int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8 };
         public MainWindow()
         {
+            LoadSettingsFile();
             InitializeComponent();
             DataContext = this;
             LoadRoomTypes();
+            LoadDates();
             cbQuantity.ItemsSource = arr.ToArray();
             #region
             //can set ItemSource directly to rooms.Keys since it returns a collection
             //List<string> keyList = new List<string>(rooms.Keys);
             cbName.ItemsSource = rooms.Keys;
             #endregion
+        }
+
+        //Try to load settings.xml
+        private void LoadSettingsFile()
+        {
+            if (!File.Exists(App.settingsXml))
+            {
+                ResetSettings(0);
+            }
+            else
+            {
+                try
+                {
+                    xDoc = XDocument.Load(App.settingsXml);
+                }
+                catch
+                {
+                    ResetSettings(1);
+                }
+            }
+        }
+
+        //Loading room types and prices from the file into rooms dictionary
+        private void LoadRoomTypes()
+        {
+            bool reload;
+            do
+            {
+                reload = false;
+                try
+                {
+                    var types = from i in xDoc.Descendants("Room")
+                                select new
+                                {
+                                    name = i.Value,
+                                    _out = i.Attribute("out").Value,
+                                    low = i.Attribute("low").Value,
+                                    high = i.Attribute("high").Value
+                                };
+                    foreach (var i in types)
+                    {
+                        decimal[] arr = new decimal[3];
+                        arr[0] = decimal.Parse(i._out);
+                        arr[1] = decimal.Parse(i.low);
+                        arr[2] = decimal.Parse(i.high);
+                        rooms.Add(i.name.ToString(), arr);
+                    }
+                }
+                catch
+                {
+                    ResetSettings(2);
+                    reload = true;
+                }
+            } while (reload);
+        }
+
+        //Loading the beginning dates of every seasson
+        public void LoadDates()
+        {
+            bool reload;
+            do
+            {
+                reload = false;
+                try
+                {
+                    var xDocDates = from i in xDoc.Descendants("Date")
+                                    select new
+                                    {
+                                        text = i.Value,
+                                        day = int.Parse(i.Attribute("day").Value),
+                                        month = int.Parse(i.Attribute("month").Value)
+                                    };
+                    var l = xDocDates.ToList();
+                    l.Sort((x, y) => x.month.CompareTo(y.month));
+                    int counter = 0;
+                    foreach (var i in l)
+                    {
+                        dates[counter, 0] = i.month;
+                        dates[counter, 1] = i.day;
+                        counter++;
+                    }
+                }
+                catch
+                {
+                    ResetSettings(3);
+                    reload = true;
+                }
+            } while (reload);
         }
 
         //Hides zero columns 
@@ -54,27 +146,6 @@ namespace TotalAmount
                 else this.Resources["Low"] = visible;
             if (isZero[2]) this.Resources["High"] = hidden;
                 else this.Resources["High"] = visible;
-        }
-
-        //Loading room types and prices from the file into rooms dictionary
-        private void LoadRoomTypes()
-        {
-            var types = from i in xDoc.Descendants("Room")
-                        select new
-                        {
-                            name = i.Value,
-                            _out = i.Attribute("out").Value,
-                            low = i.Attribute("low").Value,
-                            high = i.Attribute("high").Value
-                        };
-            foreach (var i in types)
-            {
-                decimal[] arr = new decimal[3];
-                decimal.TryParse(i._out, out arr[0]);
-                decimal.TryParse(i.low, out arr[1]);
-                decimal.TryParse(i.high, out arr[2]);
-                rooms.Add(i.name.ToString(), arr);
-            }
         }
 
         //btnAdd_Click invokes this method which checks if the selected period is valid
@@ -131,6 +202,51 @@ namespace TotalAmount
                 Reservation.RemoveAt(0);
             }
             Reservation.TotalRefresh();
+        }
+
+        private void ResetSettingsFile_Click(object sender, RoutedEventArgs e)
+        {
+            ResetSettings(10);
+        }
+
+        private void ResetSettings(int sender)
+        {
+            string path = @"settings.xml";
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                using (FileStream fs = File.Create(path))
+                {
+                    Byte[] info = new UTF8Encoding(true).GetBytes("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Settings>\n<!--Values must be decimals since decimal.TryParse is used!The rooms count can vary-->\n  <Room low=\"99\" high=\"119\" out=\"59\">DBL</Room>\n  <Room low=\"119\" high=\"149\" out=\"79\">DBLSV</Room>\n  <Room low=\"109\" high=\"139\" out=\"69\">DBLsSV</Room>\n  <Room low=\"0\" high=\"0\" out=\"0\">----</Room>\n  <Room low=\"99\" high=\"119\" out=\"69\">SNGL</Room>\n  <Room low=\"119\" high=\"149\" out=\"79\">SNGLSV</Room>\n  <Room low=\"119\" high=\"149\" out=\"79\">SNGLsSV</Room>\n  <!--Values must be integers since int.Parse is used!Exactly 4 dates must be defined!-->\n  <Date day=\"1\" month=\"7\">Силен летен</Date>\n  <Date day=\"1\" month=\"10\">Извън есзона</Date>\n  <Date day=\"16\" month=\"9\">Слаб летен - есен</Date>\n  <Date day=\"25\" month=\"5\">Слаб летен - пролет</Date>\n</Settings>");
+                    fs.Write(info, 0, info.Length);
+                }
+                xDoc = XDocument.Load(App.settingsXml);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            switch (sender)
+            {
+                case 0:
+                    MessageBox.Show("Нов файлй с настройки беше създаден.");
+                    break;
+                case 1:
+                    MessageBox.Show("Файлът с настройки беше рестартиран поради грешка в текста.");
+                    break;
+                case 2:
+                    MessageBox.Show("Файлът с настройки беше рестартиран, защото една или повече от ценните не бяха зададена коректно.");
+                    break;
+                case 3:
+                    MessageBox.Show("Файлът с настройки беше рестартиран, защото една или повече от началните дати на сезоните не бяха зададени коректно.");
+                    break;
+                default:
+                    MessageBox.Show("Файлът с настройките беше рестартиран.\nВсички дати, типове стаи и цени бяха рестартирани!");
+                    break;
+            }
         }
     }
 }

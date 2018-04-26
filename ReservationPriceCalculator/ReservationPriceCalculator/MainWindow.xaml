@@ -35,6 +35,7 @@
             <MenuItem Header="_File" Height="20">
             </MenuItem>
             <MenuItem Header="_Настройки" Height="20">
+                <MenuItem Header="_Рестартирай файла с настройките" Height="20" Click="ResetSettingsFile_Click"/>
             </MenuItem>
             <MenuItem Header="_Помощ" Height="20">
                 <MenuItem Header="_Помощ" Height="20">
