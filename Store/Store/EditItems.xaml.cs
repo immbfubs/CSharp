@@ -45,12 +45,10 @@ namespace Store
         public EditItems()
         {
             //необходимо за listBox Binding
-            //на какво е равно dataContext before that
             this.DataContext = this;
             mainWindow.IsEnabled = false;
             LoadShopItems();
             InitializeComponent();
-            //сортиране на Елементите в itemsBox (индексът на елементите също се променя)
             itemsBox.Items.SortDescriptions.Add(
                  new System.ComponentModel.SortDescription("Name", System.ComponentModel.ListSortDirection.Ascending));
         }

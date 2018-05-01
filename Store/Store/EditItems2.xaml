@@ -23,8 +23,8 @@
             </ListView.View>
         </ListView>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Button Width="70" Click="ButtonAdd_Click" BorderThickness="0,1,1,0">Добави</Button>
-            <Button Width="70" Click="ButtonChange_Click" BorderThickness="0,1,1,0">Промени</Button>
+            <Button Width="70" Click="AddButton_Click" BorderThickness="0,1,1,0">Добави</Button>
+            <Button Width="70" Click="ChangeButton_Click" BorderThickness="0,1,1,0">Промени</Button>
             <Button Width="70" Click="DeleteButton_click" BorderThickness="0,1,1,0">Изтрий</Button>
         </StackPanel>
     </Grid>

@@ -7,6 +7,7 @@ using System.ComponentModel;
 
 namespace Store
 {
+    //Why have i used this interface?
     public class Item : INotifyPropertyChanged
     {   public string Name { get; set; }
         public decimal Price { get; set; }

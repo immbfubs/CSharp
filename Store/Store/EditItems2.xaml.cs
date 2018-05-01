@@ -30,10 +30,13 @@ namespace Store
             InitializeComponent();
             itemsListView.Items.SortDescriptions.Add(
                  new System.ComponentModel.SortDescription("Key", System.ComponentModel.ListSortDirection.Ascending));
+            itemsListView.Items.SortDescriptions.Add(
+                 new System.ComponentModel.SortDescription("Key", System.ComponentModel.ListSortDirection.Descending));
             //Това добра необходимо ли е или ресурсите се изчистват сами
+            MessageBox.Show(itemsListView.Items.SortDescriptions.Count.ToString());
         }
 
-        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
+        private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             if (itemsListView.SelectedIndex != -1)
             {
@@ -41,7 +44,7 @@ namespace Store
             }
         }
 
-        private void ButtonChange_Click(object sender, RoutedEventArgs e)
+        private void ChangeButton_Click(object sender, RoutedEventArgs e)
         {
             if (itemsListView.SelectedItems.Count == 1)
             {
