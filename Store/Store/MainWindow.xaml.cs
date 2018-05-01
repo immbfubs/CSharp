@@ -16,9 +16,6 @@ namespace Store
     public partial class MainWindow : Window
     {
         public ItemsCollection Basket { get; } = new ItemsCollection();
-        //equals
-        //public ObservableCollection<Item> basket = new ObservableCollection<Item>();
-        //public ObservableCollection<Item> Basket { get { return basket; } }
         public static XDocument xdoc = XDocument.Load(Application.itemsXmlPath);
         public static Dictionary<string, string> dict = new Dictionary<string, string>();
 

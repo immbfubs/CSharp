@@ -50,7 +50,7 @@ namespace Store
             LoadShopItems();
             InitializeComponent();
             itemsBox.Items.SortDescriptions.Add(
-                 new System.ComponentModel.SortDescription("Name", System.ComponentModel.ListSortDirection.Ascending));
+                 new System.ComponentModel.SortDescription("Price", System.ComponentModel.ListSortDirection.Ascending));
         }
 
         private void LoadShopItems()

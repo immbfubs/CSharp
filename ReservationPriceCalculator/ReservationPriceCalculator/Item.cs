@@ -65,10 +65,10 @@ namespace TotalAmount
             int a,b;
             //if Price[i] gets addressed PropertyChanged is not working. Why? Setter is not invoked that way?
             decimal[] arri = new decimal[4];
-            DateTime date0 = new DateTime(CheckInDate.Year, mainWindow.dates[0, 0], mainWindow.dates[0, 1]);
-            DateTime date1 = new DateTime(CheckInDate.Year, mainWindow.dates[1, 0], mainWindow.dates[1, 1]);
-            DateTime date2 = new DateTime(CheckInDate.Year, mainWindow.dates[2, 0], mainWindow.dates[2, 1]);
-            DateTime date3 = new DateTime(CheckInDate.Year, mainWindow.dates[3, 0], mainWindow.dates[3, 1]);
+            DateTime date0 = new DateTime(CheckInDate.Year, mainWindow.seassons[0].month, mainWindow.seassons[0].day);
+            DateTime date1 = new DateTime(CheckInDate.Year, mainWindow.seassons[1].month, mainWindow.seassons[1].day);
+            DateTime date2 = new DateTime(CheckInDate.Year, mainWindow.seassons[2].month, mainWindow.seassons[2].day);
+            DateTime date3 = new DateTime(CheckInDate.Year, mainWindow.seassons[3].month, mainWindow.seassons[3].day);
 
             //Determine in which tourist seassons are Check-In and Check-Out dates
             if (CheckInDate.CompareTo(date0) < 0) a = 0;

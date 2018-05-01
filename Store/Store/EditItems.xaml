@@ -14,7 +14,7 @@
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <ListBox Name="itemsBox" Grid.Row="0" ItemsSource="{Binding AllShopItems}" SelectionMode="Extended" ScrollViewer.CanContentScroll="False" FontSize="15">
+        <ListBox Name="itemsBox" Grid.Row="0" ItemsSource="{Binding AllShopItems}" SelectionMode="Extended" ScrollViewer.CanContentScroll="True" FontSize="15">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

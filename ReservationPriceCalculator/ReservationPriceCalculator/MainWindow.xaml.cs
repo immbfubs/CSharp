@@ -8,12 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace TotalAmount
 {
@@ -24,7 +18,13 @@ namespace TotalAmount
     {
         public static XDocument xDoc;
         public static Dictionary<string, decimal[]> rooms = new Dictionary<string, decimal[]>();
-        public int[,] dates = new int[10,2];
+        public struct Seasson
+        {
+            public int day;
+            public int month;
+            public string name;
+        }
+        public Seasson[] seassons = new Seasson[5];
         public Reservation Reservation { get; } = new Reservation();
 
         public int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -44,7 +44,7 @@ namespace TotalAmount
         }
 
         //Try to load settings.xml
-        private void LoadSettingsFile()
+        public void LoadSettingsFile()
         {
             if (!File.Exists(App.settingsXml))
             {
@@ -64,7 +64,7 @@ namespace TotalAmount
         }
 
         //Loading room types and prices from the file into rooms dictionary
-        private void LoadRoomTypes()
+        public void LoadRoomTypes()
         {
             bool reload;
             do
@@ -109,7 +109,7 @@ namespace TotalAmount
                     var xDocDates = from i in xDoc.Descendants("Date")
                                     select new
                                     {
-                                        text = i.Value,
+                                        name = i.Value,
                                         day = int.Parse(i.Attribute("day").Value),
                                         month = int.Parse(i.Attribute("month").Value)
                                     };
@@ -118,8 +118,9 @@ namespace TotalAmount
                     int counter = 0;
                     foreach (var i in l)
                     {
-                        dates[counter, 0] = i.month;
-                        dates[counter, 1] = i.day;
+                        seassons[counter].day = i.day;
+                        seassons[counter].month = i.month;
+                        seassons[counter].name = i.name;
                         counter++;
                     }
                 }
@@ -204,9 +205,25 @@ namespace TotalAmount
             Reservation.TotalRefresh();
         }
 
-        private void ResetSettingsFile_Click(object sender, RoutedEventArgs e)
+        private void MenuClick_Seassons(object sender, RoutedEventArgs e)
         {
-            ResetSettings(10);
+            SeassonsWindow seassonsWindow = new SeassonsWindow();
+            seassonsWindow.ShowDialog();
+            LoadSettingsFile();
+            LoadRoomTypes();
+            LoadDates();
+        }
+
+        private void MenuClick_RoomTypes(object sender, RoutedEventArgs e)
+        {
+            RoomTypess roomsWindow = new RoomTypess();
+            roomsWindow.ShowDialog();
+        }
+
+        private void MenuClick_ResetSettingsFile(object sender, RoutedEventArgs e)
+        {
+            var message = MessageBox.Show("Всички сезони и цени ще бъдат рестартирани на първоначално зададените!\nСигурни ли сте?", "Внимание!", MessageBoxButton.YesNo);
+            if (message == MessageBoxResult.Yes) ResetSettings(10);
         }
 
         private void ResetSettings(int sender)

@@ -13,8 +13,8 @@
 
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-            <GradientStop Color="#FF9FC8F1" Offset="1"/>
-            <GradientStop Color="#FF3D7DBD"/>
+            <GradientStop Color="#53729b"/>
+            <GradientStop Color="#c4ddff" Offset="1"/>
         </LinearGradientBrush>
     </Window.Background>
     <Window.Resources>
@@ -30,12 +30,14 @@
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        
-        <Menu Grid.Row="0" Background="#E0FFFFFF" Foreground="#FF1856D8">
+
+        <Menu Grid.Row="0" Background="#E0FFFFFF" Foreground="#FF08338e">
             <MenuItem Header="_File" Height="20">
             </MenuItem>
             <MenuItem Header="_Настройки" Height="20">
-                <MenuItem Header="_Рестартирай файла с настройките" Height="20" Click="ResetSettingsFile_Click"/>
+                <MenuItem Header="_Сезони" Height="20" Click="MenuClick_Seassons"/>
+                <MenuItem Header="_Типове стаи" Height="20" Click="MenuClick_RoomTypes"/>
+                <MenuItem Header="_Рестартирай файла с настройките" Height="20" Click="MenuClick_ResetSettingsFile"/>
             </MenuItem>
             <MenuItem Header="_Помощ" Height="20">
                 <MenuItem Header="_Помощ" Height="20">
@@ -67,7 +69,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2">
-            <ListBox Name ="lBox" Background="#99FFFFFF" BorderThickness="0" ItemsSource="{Binding Reservation}" MaxHeight="215" VerticalAlignment="Top">
+            <ListBox Name ="lBox" Background="#AAFFFFFF" BorderThickness="0" ItemsSource="{Binding Reservation}" MaxHeight="215" VerticalAlignment="Top">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -101,12 +103,14 @@
                           Width="40"
                           SelectedIndex="0"
                           IsTextSearchEnabled="True"
-                          Background="#CCFFFFFF"></ComboBox>
+                          Background="#CCFFFFFF"
+                          VerticalContentAlignment="Center"></ComboBox>
                 <ComboBox Name="cbName"
                           Width="80"
                           SelectedIndex="1"
                           IsTextSearchEnabled="True"
-                          Background="#CCFFFFFF"></ComboBox>
+                          Background="#CCFFFFFF"
+                          VerticalContentAlignment="Center"></ComboBox>
                 <DatePicker Name ="dpCheckIn"
                             Margin="0,0,0,0"
                             Width="130"
