@@ -20,8 +20,7 @@ namespace Store
     /// </summary>
     public partial class EditItems : Window
     {
-        //целта на mainWindow e да може той да се използва в child windows
-        //друг вариант е последния коментар на
+        //друг вариант за mainWindow - в последния коментар
         //https:/stackoverflow.com/questions/1130208/how-to-disable-the-parent-form-when-a-child-form-is-active
         MainWindow mainWindow = (MainWindow)Application.Current.MainWindow; 
 
@@ -38,13 +37,14 @@ namespace Store
 
         public ShopItems AllShopItems { get; } = new ShopItems();
 
-        //защо трябва да се деклариреа клас който да имплементира ObservableCollection
-        //вместо да се направи инстанция на ObservableCollection ?
+        //защо трябва да се деклариреа клас който да наследява ObservableCollection
+        //вместо да се направи инстанция на ObservableCollection:
         //ObservableCollection<ShopItem> SssItems { get; } = new ObservableCollection<ShopItem>();
+        //МОЖЕ ако се зададе listBoxObject.ItemsSource след InitializeComponent();
 
         public EditItems()
         {
-            //необходимо за listBox Binding
+            //необходимо за Binding
             this.DataContext = this;
             mainWindow.IsEnabled = false;
             LoadShopItems();
