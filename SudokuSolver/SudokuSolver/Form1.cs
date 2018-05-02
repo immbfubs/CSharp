@@ -7,13 +7,16 @@ namespace SudokuSolver
 {
     public partial class Form1 : Form
     {
-        int no3=0, no6=0, no4=0, no2=0, no5=0;
+        int[] methodNo = { 0, 0, 0, 0, 0, 0, 0 };
         int filled, depth;
+        //[i, j]
         int[,] arr = new int[10, 10];
+        //[i, j]
         string[,] str = new string[10, 10];
+        //[block_No, box_No, i_j_indexes]
         int[,,] block = new int[10, 10, 2];
         bool change, error;
-        string text, dp;
+        string dp;
 
         public Form1()
         {
@@ -22,16 +25,16 @@ namespace SudokuSolver
             depth = 0;
             error = false;
             InitializeComponent();
-            populate();
+            Populate();
         }
 
-        void trySolve()
+        void TryToSolve()
         {
             dp = dp + depth.ToString()+" ";
             do
             {
                 change = false;
-                soleCandidate(1);
+                SoleCandidate();
                 UniqueCandidate();
                 CorrectRowsColsViaBlocks();
                 NakedSubset();
@@ -42,12 +45,14 @@ namespace SudokuSolver
 
             if (filled == 81)
             {
-                MessageBox.Show(
-                "NakedSubset() succeeded " + no4.ToString() + " times\n"
-                + "FindHook() succeeded " + no6.ToString() + " times\n"
-                + "CorrectRowsColsViaBlocks() succeeded " + no2.ToString() + " times\n"
-                + "CorrectBlocksViaRowsCols() succeeded " + no3.ToString() + " times\n"
-                + "HiddenSubset() succeeded " + no5.ToString() + " times\n");
+                //MessageBox.Show(
+                //"SoleCandidate() succeeded " + methodNo[0].ToString() + " times\n"
+                //+ "UniqueCandidate() succeeded " + methodNo[1].ToString() + " times\n"
+                //+ "NakedSubset() succeeded " + methodNo[4].ToString() + " times\n"
+                //+ "CorrectRowsColsViaBlocks() succeeded " + methodNo[2].ToString() + " times\n"
+                //+ "CorrectBlocksViaRowsCols() succeeded " + methodNo[3].ToString() + " times\n"
+                //+ "HiddenSubset() succeeded " + methodNo[5].ToString() + " times\n"
+                //+ "FindHook() succeeded " + methodNo[6].ToString() + " times\n");
                 label1.Text = "Solved!";
             }
 
@@ -58,65 +63,72 @@ namespace SudokuSolver
 
             if (error) { dp = dp + "e "; }
         }
-        
-        void tbTextChange(object sender, EventArgs e)
-        {
-            TextBox tb = (TextBox)sender;
-            string name = tb.Name;
 
-            change = true;
-            int num, i, j;
-            int.TryParse(name.Substring(7), out num);
-            i = (int)Math.Ceiling(((double)num) / 9);
-            j = num - ((i - 1) * 9);
-            if (!int.TryParse(tb.Text, out arr[i, j]))
-            {
-                tb.ResetText();
-            }
-            else
-            {
-                str[i, j] = "";
-                correctNeighbors(i, j, arr[i, j]);
-                tb.Enabled = false;
-                tb.BackColor = Color.LightBlue;
-                filled++;
-            }
-            load.Text = "Filled: "+filled.ToString();
-        }
-
-        void soleCandidate(int q)
+        //Fills the array values into the text boxes after trySolve() has finished
+        void FillTextBoxes()
         {
             for (int i = 1; i < 10; i++)
             {
                 for (int j = 1; j < 10; j++)
                 {
-                    if (str[i, j].Length == q)
+                    if (arr[i, j] > 0)
                     {
-                        if (q == 1)
-                        {
-                            getTb(i, j).Text = str[i, j];
-                        }
-                        else
-                        {
-                            getTb(i, j).BackColor = Color.Coral;
-                        }
+                        GetTextBox(i, j).Text = arr[i, j].ToString();
                     }
                 }
             }
         }
 
-        void correctNeighbors(int x, int y, int num)
+        //Finds the indexes of the given TextBox object
+        void FindTextBoxIJ(TextBox tb, out int i, out int j)
+        {
+            double.TryParse(tb.Name.Substring(7), out double num);
+            i = (int)Math.Ceiling(num / 9d);
+            j = Convert.ToInt32(num - ((i - 1) * 9));
+        }
+        
+        //Fills a value in arr[i,j]
+        void Fill(int i, int j, int num)
+        {
+            arr[i,j] = num;
+            str[i, j] = "";
+            filled++;
+            CorrectNeighbors(i, j, arr[i, j]);
+            change = true;
+        }
+
+        //Executes on any TextBox.Text change event
+        void TextBoxTextChange(object sender, EventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+
+            FindTextBoxIJ(tb, out int i, out int j);
+            if (!int.TryParse(tb.Text, out int num))
+            {
+                tb.ResetText();
+            }
+            else
+            {
+                if(arr[i, j] < 1) Fill(i, j, num);
+                tb.Enabled = false;
+                tb.BackColor = Color.LightBlue;
+            }
+            load.Text = "Filled: "+filled.ToString();
+        }
+
+        //(REMOVES)
+        void CorrectNeighbors(int x, int y, int num)
         {
             //ROWS COLS
             for (int i = 1; i < 10; i++)
             {
                 if (i != y && str[x, i].Contains(num.ToString()))
                 {
-                    strRemove(x,i,num);
+                    StrRemove(x,i,num);
                 }
                 if (i != x && str[i, y].Contains(num.ToString()))
                 {
-                    strRemove(i,y,num);
+                    StrRemove(i,y,num);
                 }
             }
 
@@ -127,18 +139,17 @@ namespace SudokuSolver
                 {
                     for (int j = y - 2; j < y + 3; j++)
                     {
-                        if (j > 0 && j < 10 && getQuad(i, j) == getQuad(x, y) && str[i, j].Contains(num.ToString()))
+                        if (j > 0 && j < 10 && GetBlock(i, j) == GetBlock(x, y) && str[i, j].Contains(num.ToString()))
                         {
-                            strRemove(i, j, num);
+                            StrRemove(i, j, num);
                         }
                     }
                 }
             }
         }
-        
-        //LAST
 
-        void populate()
+        //Fills the initial values of some variables
+        void Populate()
         {
             //str[,]
             for (int i = 1; i < 10; i++)
@@ -155,7 +166,7 @@ namespace SudokuSolver
                 for (int j = 1; j < 10; j++)
                 {
                     int tb_num, a, b;
-                    int.TryParse(getTb(i, j).Name.Substring(7), out tb_num);
+                    int.TryParse(GetTextBox(i, j).Name.Substring(7), out tb_num);
                     Math.DivRem(j, 3, out b);
                     if (b == 0) { b = 3; }
                     Math.DivRem(i, 3, out a);
@@ -167,109 +178,116 @@ namespace SudokuSolver
                     }
                     int c = 3 * a + b;
 
-                    block[getQuad(i, j), c, 0] = i;
-                    block[getQuad(i, j), c, 1] = j;
+                    block[GetBlock(i, j), c, 0] = i;
+                    block[GetBlock(i, j), c, 1] = j;
                 }
             }
         }
 
-        int getQuad(int i, int j)
+        //Gets the number of the block that holds the cell with the given indexes
+        int GetBlock(int i, int j)
         {
             int b = (int) Math.Ceiling(((double)j) / 3);
             int a = (int) (Math.Ceiling(((double)i) / 3))-1;
             return (a*3 + b);
         }
-        
-        TextBox getTb(int i, int j)
+
+        //Gets a TextBox object given its indexes
+        TextBox GetTextBox(int i, int j)
         {
             int num = i*9 - (9 - j);
             TextBox tb = (TextBox)Controls.Find("textBox" + num.ToString(), true)[0];
             return tb;
         }
 
-        TextBox getTb(int num)
+        //Gets a TextBox object given its sequential number
+        TextBox GetTextBox(int num)
         {
             TextBox tb = (TextBox)Controls.Find("textBox" + num.ToString(), true)[0];
             return tb;
         }
 
-        void strRemove(int i, int j, int num)
+        void StrRemove(int i, int j, int num)
         {
             str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num.ToString()), 1);
             change = true;
             if (str[i, j].Length < 1)
             {
                 error = true;
-                getTb(i, j).BackColor = Color.Red;
+                GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
-        void strRemove(int i, int j, char num)
+        void StrRemove(int i, int j, char num)
         {
             str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num), 1);
             change = true;
             if (str[i, j].Length < 1)
             {
                 error = true;
-                getTb(i, j).BackColor = Color.Red;
+                GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
-        void strRemove(int i, int j, string num)
+        void StrRemove(int i, int j, string num)
         {
             str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num), 1);
             change = true;
             if (str[i, j].Length < 1)
             {
                 error = true;
-                getTb(i, j).BackColor = Color.Red;
+                GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
         void solve_Click(object sender, EventArgs e)
         {
-            trySolve();
+            TryToSolve();
+            FillTextBoxes();
         }
 
         void load_Click(object sender, EventArgs e)
         {
-            int size = -1;
+            string text = "";
             DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
             if (result == DialogResult.OK) // Test result.
             {
-                load.BackColor = Color.White;
-                load.Enabled = false;
-                string file = openFileDialog1.FileName;
                 try
                 {
+                    string file = openFileDialog1.FileName;
                     text = File.ReadAllText(file);
-                    size = text.Length;
+                    load.Enabled = false;
+                    load.BackColor = Color.White;
                 }
-                catch (IOException) { }
+                catch (IOException ex) { MessageBox.Show("The file was not properly loaded.\n Error: " + ex.ToString()); }
 
                 int counter = 0;
-                int b;
+                bool symbolEncountered = false;
                 foreach (char a in text)
                 {
-                    if (int.TryParse(a.ToString(), out b) && counter < 81)
+                    if (int.TryParse(a.ToString(), out int b))
                     {
                         counter++;
                         if (b != 0)
                         {
-                            getTb(counter).Text = b.ToString();
+                            GetTextBox(counter).Text = b.ToString();
                         }
                     }
+                    else
+                    {
+                        symbolEncountered = true;
+                    }
                 }
+                if(counter != 81 && symbolEncountered) MessageBox.Show("The length of the file is different from 81.\nA symbol different than a number was encountered.\nMake sure that the sudoku is introduced correctly!");
+                else if (counter != 81) MessageBox.Show("The length of the file is different from 81.\nMake sure that the sudoku is introduced correctly!");
+                else if (symbolEncountered) MessageBox.Show("A symbol different than a number was encountered.\nMake sure that the sudoku is introduced correctly!\n\nWHY IS THIS HAPPENING?!?");
             }
         }
 
         void tb_click(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            int i, j, x;
-            int.TryParse(tb.Name.Substring(7), out x);
-            i = (int)Math.Ceiling(((double)x) / 9);
-            j = x - ((i - 1) * 9);
+            FindTextBoxIJ(tb, out int i, out int j);
             label1.Text = str[i, j].ToString();
         }
         

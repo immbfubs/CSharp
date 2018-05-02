@@ -1,14 +1,35 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace SudokuSolver
 {
-    public partial class Form1 : Form
+    partial class Form1
     {
         ///<summary>
-        ///#1 (FILLS) Checks if only one cell in a row, column or block contains a digit as a possibility.
+        ///#0 (FILLS) Determines if there is a cell with only one possible entry
+        ///</summary>
+        void SoleCandidate()
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                for (int j = 1; j < 10; j++)
+                {
+                    if (str[i, j].Length == 1)
+                    {
+                        Fill(i, j, int.Parse(str[i, j]));
+                        methodNo[0]++;
+                    }
+                }
+            }
+        }
+
+        ///<summary>
+        ///#1 (FILLS) Checks if only one cell in a row, column or block contains a certain digit as a possibility.
         ///</summary>
         void UniqueCandidate()
         {
@@ -31,7 +52,8 @@ namespace SudokuSolver
                         {
                             if (str[block[q, i, 0], block[q, i, 1]].Contains(num.ToString()))
                             {
-                                getTb(block[q, i, 0], block[q, i, 1]).Text = num.ToString();
+                                Fill(block[q, i, 0], block[q, i, 1], num);
+                                methodNo[1]++;
                             }
                         }
                     }
@@ -57,7 +79,7 @@ namespace SudokuSolver
                         {
                             if (str[i, j].Contains(num.ToString()))
                             {
-                                getTb(i, j).Text = num.ToString();
+                                Fill(i, j, num);
                             }
                         }
                     }
@@ -83,7 +105,7 @@ namespace SudokuSolver
                         {
                             if (str[i, j].Contains(num.ToString()))
                             {
-                                getTb(i, j).Text = num.ToString();
+                                Fill(i, j, num);
                             }
                         }
                     }
@@ -92,7 +114,7 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#2 (REMOVES) If only two cells in a block contain a digit and they have the same rown or column index, removes that digit from the possibilities for the other cells in that row/column. 
+        ///#2 (REMOVES) If only two cells in a block contain a digit and they share the same rown or column index, removes that digit from the possibilities for the other cells in that row/column. 
         ///</summary>
         void CorrectRowsColsViaBlocks()
         {
@@ -121,10 +143,10 @@ namespace SudokuSolver
                     {
                         for (int x = 1; x < 10; x++)
                         {
-                            if (getQuad(i, x) != q && str[i, x].Contains(n.ToString()))
+                            if (GetBlock(i, x) != q && str[i, x].Contains(n.ToString()))
                             {
-                                no2++;
-                                strRemove(i, x, n);
+                                methodNo[2]++;
+                                StrRemove(i, x, n);
                             }
                         }
                     }
@@ -132,10 +154,10 @@ namespace SudokuSolver
                     {
                         for (int x = 1; x < 10; x++)
                         {
-                            if (getQuad(x, j) != q && str[x, j].Contains(n.ToString()))
+                            if (GetBlock(x, j) != q && str[x, j].Contains(n.ToString()))
                             {
-                                no2++;
-                                strRemove(x, j, n);
+                                methodNo[2]++;
+                                StrRemove(x, j, n);
                             }
                         }
                     }
@@ -165,11 +187,11 @@ namespace SudokuSolver
                             counter++;
                             if (q == 0)
                             {
-                                q = getQuad(i, j);
+                                q = GetBlock(i, j);
                             }
                             else
                             {
-                                if (getQuad(i, j) != q)
+                                if (GetBlock(i, j) != q)
                                 {
                                     sameQuad = false;
                                     break;
@@ -183,8 +205,8 @@ namespace SudokuSolver
                         {
                             if (block[q, n, 0] != i && str[block[q, n, 0], block[q, n, 1]].Contains(num.ToString()))
                             {
-                                no3++;
-                                strRemove(block[q, n, 0], block[q, n, 1], num);
+                                methodNo[3]++;
+                                StrRemove(block[q, n, 0], block[q, n, 1], num);
                             }
                         }
                     }
@@ -202,11 +224,11 @@ namespace SudokuSolver
                             counter++;
                             if (i == 1)
                             {
-                                q = getQuad(i, j);
+                                q = GetBlock(i, j);
                             }
                             else
                             {
-                                if (getQuad(i, j) != q)
+                                if (GetBlock(i, j) != q)
                                 {
                                     sameQuad = false;
                                     break;
@@ -220,8 +242,8 @@ namespace SudokuSolver
                         {
                             if (block[q, n, 1] != j && str[block[q, n, 0], block[q, n, 1]].Contains(num.ToString()))
                             {
-                                no3++;
-                                strRemove(block[q, n, 0], block[q, n, 1], num);
+                                methodNo[3]++;
+                                StrRemove(block[q, n, 0], block[q, n, 1], num);
                             }
                         }
                     }
@@ -230,7 +252,7 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#4 (REMOVES) Checks if two connected boxes contatin only two digits and if they are the same, trims these digits from the other connected boxes.
+        ///#4 (REMOVES) Checks if two connected cells contatin only two digits and if they are equal, trims these digits from the other connected cells.
         ///</summary>
         void NakedSubset()
         {
@@ -262,13 +284,13 @@ namespace SudokuSolver
                                 {
                                     if (str[ctnr[a, 0], j].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
                                     {
-                                        no4++;
-                                        strRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        methodNo[4]++;
+                                        StrRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][0]);
                                     }
                                     if (str[ctnr[a, 0], j].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
                                     {
-                                        no4++;
-                                        strRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        methodNo[4]++;
+                                        StrRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][1]);
                                     }
                                 }
                             }
@@ -281,20 +303,20 @@ namespace SudokuSolver
                                 {
                                     if (str[i, ctnr[a, 1]].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
                                     {
-                                        no4++;
-                                        strRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        methodNo[4]++;
+                                        StrRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][0]);
                                     }
                                     if (str[i, ctnr[a, 1]].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
                                     {
-                                        no4++;
-                                        strRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        methodNo[4]++;
+                                        StrRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][1]);
                                     }
                                 }
                             }
                         }
-                        if (getQuad(ctnr[a, 0], ctnr[a, 1]) == getQuad(ctnr[b, 0], ctnr[b, 1]))
+                        if (GetBlock(ctnr[a, 0], ctnr[a, 1]) == GetBlock(ctnr[b, 0], ctnr[b, 1]))
                         {
-                            int q = getQuad(ctnr[a, 0], ctnr[a, 1]);
+                            int q = GetBlock(ctnr[a, 0], ctnr[a, 1]);
                             for (int n = 1; n < 10; n++)
                             {
                                 int i = block[q, n, 0];
@@ -303,13 +325,13 @@ namespace SudokuSolver
                                 {
                                     if (str[i, j].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
                                     {
-                                        no4++;
-                                        strRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        methodNo[4]++;
+                                        StrRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][0]);
                                     }
                                     if (str[i, j].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
                                     {
-                                        no4++;
-                                        strRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        methodNo[4]++;
+                                        StrRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][1]);
                                     }
                                 }
                             }
@@ -320,7 +342,7 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#5 (REMOVES) Checks if two connected boxes are the only one to contain two digits and trims the other possible digits
+        ///#5 (REMOVES) Checks if two connected cells are the only one to contain two pairs of equal digits and trims the other possible digits
         ///</summary>
         void HiddenSubset()
         {
@@ -367,13 +389,13 @@ namespace SudokuSolver
                                         {
                                             if (str[i, j1].Contains(num.ToString()))
                                             {
-                                                strRemove(i, j1, num);
-                                                no5++;
+                                                StrRemove(i, j1, num);
+                                                methodNo[5]++;
                                             }
                                             if (str[i, j2].Contains(num.ToString()))
                                             {
-                                                strRemove(i, j2, num);
-                                                no5++;
+                                                StrRemove(i, j2, num);
+                                                methodNo[5]++;
                                             }
                                         }
                                     }
@@ -427,13 +449,13 @@ namespace SudokuSolver
                                         {
                                             if (str[i1, j].Contains(num.ToString()))
                                             {
-                                                strRemove(i1, j, num);
-                                                no5++;
+                                                StrRemove(i1, j, num);
+                                                methodNo[5]++;
                                             }
                                             if (str[i2, j].Contains(num.ToString()))
                                             {
-                                                strRemove(i2, j, num);
-                                                no5++;
+                                                StrRemove(i2, j, num);
+                                                methodNo[5]++;
                                             }
                                         }
                                     }
@@ -446,7 +468,7 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#6 (REMOVES)
+        ///#6 (partial)
         ///</summary>
         void FindHook()
         {
@@ -470,7 +492,7 @@ namespace SudokuSolver
             {
                 for (int b = 0; b < counter + 1; b++)
                 {
-                    if (getQuad(ctnr[a, 0], ctnr[a, 1]) != getQuad(ctnr[b, 0], ctnr[b, 1]))
+                    if (GetBlock(ctnr[a, 0], ctnr[a, 1]) != GetBlock(ctnr[b, 0], ctnr[b, 1]))
                     {
                         if (ctnr[a, 0] == ctnr[b, 0] || ctnr[a, 1] == ctnr[b, 1])
                         {
@@ -491,6 +513,9 @@ namespace SudokuSolver
             }
         }
 
+        ///<summary>
+        ///#6 (REMOVES) (partial)
+        ///</summary>
         void FindHookPoint(int i1, int j1, int i2, int j2, char val1, ref int[,] ctnr, ref int counter)
         {
             // findHook() extention
@@ -508,7 +533,7 @@ namespace SudokuSolver
 
             for (int x = 0; x < counter; x++)
             {
-                if ((getQuad(i2, j2) == getQuad(ctnr[x, 0], ctnr[x, 1])) && ctnr[x, 0] != i1 && ctnr[x, 1] != j1)
+                if ((GetBlock(i2, j2) == GetBlock(ctnr[x, 0], ctnr[x, 1])) && ctnr[x, 0] != i1 && ctnr[x, 1] != j1)
                 {
                     if (str[ctnr[x, 0], ctnr[x, 1]].Contains(val2) && str[ctnr[x, 0], ctnr[x, 1]].Contains(eliminator))
                     {
@@ -517,11 +542,11 @@ namespace SudokuSolver
                         {
                             for (int j = 1; j < 10; j++)
                             {
-                                if (str[ctnr[x, 0], j].Contains(eliminator) && getQuad(ctnr[x, 0], j) == getQuad(i1, j1))
+                                if (str[ctnr[x, 0], j].Contains(eliminator) && GetBlock(ctnr[x, 0], j) == GetBlock(i1, j1))
                                 {
                                     //getTb(ctnr[x, 0], j).BackColor = Color.Black;
-                                    no6++;
-                                    strRemove(ctnr[x, 0], j, eliminator);
+                                    methodNo[6]++;
+                                    StrRemove(ctnr[x, 0], j, eliminator);
                                 }
                             }
                         }
@@ -529,11 +554,11 @@ namespace SudokuSolver
                         {
                             for (int i = 1; i < 10; i++)
                             {
-                                if (str[i, ctnr[x, 1]].Contains(eliminator) && getQuad(i, ctnr[x, 1]) == getQuad(i1, j1))
+                                if (str[i, ctnr[x, 1]].Contains(eliminator) && GetBlock(i, ctnr[x, 1]) == GetBlock(i1, j1))
                                 {
                                     //getTb(i, ctnr[x, 1]).BackColor = Color.Black;
-                                    no6++;
-                                    strRemove(i, ctnr[x, 1], eliminator);
+                                    methodNo[6]++;
+                                    StrRemove(i, ctnr[x, 1], eliminator);
                                 }
                             }
                         }
@@ -542,10 +567,13 @@ namespace SudokuSolver
             }
         }
 
-        // Cheater
-
         ///<summary>
-        ///Search for cells with two possible digits and fills one of them them enters recursion while storing the needed data to restore the puzzle on failure. On failure tries the other digit.
+        ///This is a method that a human would not use to solve an expert level sudoku.
+        ///It finds cells with two possible numbers left and fills one of them in, then tries to solve the sudoku again.
+        ///Before that stores the puzzle progress to restore it in case of failure.
+        ///On failure restores the sudoku before the filling of the cell and fills in the second possible number.
+        ///It will try to guess the right number of as many cells as needed to solve the puzzle.
+        ///If it fails to find a cell with two possible entries the sudoku won't be solved.
         ///</summary>
         void TryToCheat()
         {
@@ -565,21 +593,21 @@ namespace SudokuSolver
                     }
                 }
             }
-            dp = dp + "\n("+i.ToString()+j.ToString()+") ";
+            dp = dp + "\n(" + i.ToString() + j.ToString() + ") ";
             if (i != 0)
             {
                 int filledOld = filled;
                 Array.Copy(arr, oldArr, arr.Length);
                 Array.Copy(str, oldStr, str.Length);
-                getTb(i, j).Text = str[i, j][0].ToString();
+                Fill(i, j, int.Parse(str[i, j][0].ToString()));
 
-                trySolve();
+                TryToSolve();
 
                 if (filled < 81)
                 {
                     Restore(oldArr, oldStr, filledOld);
-                    getTb(i, j).Text = str[i, j][1].ToString();
-                    trySolve();
+                    Fill(i, j, int.Parse(str[i, j][1].ToString()));
+                    TryToSolve();
                 }
 
                 if (filled < 81)
@@ -592,29 +620,10 @@ namespace SudokuSolver
 
         void Restore(int[,] oldArr, string[,] oldStr, int filledOld)
         {
-            foreach (Control x in this.Controls)
-            {
-                if (x is TextBox)
-                {
-                    ((TextBox)x).Enabled = true;
-                    ((TextBox)x).ResetText();
-                    ((TextBox)x).BackColor = Color.White;
-                }
-            }
-            filled = 0;
+            filled = filledOld;
             error = false;
             Array.Copy(oldArr, arr, arr.Length);
             Array.Copy(oldStr, str, str.Length);
-            for (int i = 1; i < 10; i++)
-            {
-                for (int j = 1; j < 10; j++)
-                {
-                    if (arr[i, j] > 0)
-                    {
-                        getTb(i, j).Text = arr[i, j].ToString();
-                    }
-                }
-            }
         }
     }
 }

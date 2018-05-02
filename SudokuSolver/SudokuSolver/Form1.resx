@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <metadata name="openFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
+    <value>27, 22</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>62</value>
@@ -129,7 +129,7 @@
         AAABAAkAAAAAAAEAIAC3SgAAlgAAAICAAAABACAAKAgBAE1LAABgYAAAAQAgAKiUAAB1UwEASEgAAAEA
         IACIVAAAHegBAEBAAAABACAAKEIAAKU8AgAwMAAAAQAgAKglAADNfgIAICAAAAEAIACoEAAAdaQCABgY
         AAABACAAiAkAAB21AgAQEAAAAQAgAGgEAAClvgIAiVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABc
-        cqhmAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO29d5Qjx33v++2APABmMIOJm3d2uYFhmUkx
+        cqhmAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4no29d5Qjx33v++2APABmMIOJm3d2uYFhmUkx
         m5KsREqUaOnymor2le0rW1cOR+/Z58k6PvfoXEm+tvUcZNmW9cRLiRRJSxaXEimKYZfkMi3JXS53uTOb
         J89OwAAzyOhQ749GAw10IzTQjUn12VOL6YDu6kLXt371qwRQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQK
         hUKhUCgUCoVCWb0wyx0BK1hYWOjI5XLXcBy30+Fw9OdyuatlWd4GwM+yrJvjOBfHcU6WZTk748EwDHie
