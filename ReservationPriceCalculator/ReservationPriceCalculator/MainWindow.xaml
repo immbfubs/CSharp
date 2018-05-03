@@ -45,10 +45,6 @@
                         <MenuItem Header="_Помощ" Height="20">
                             <MenuItem Header="_Помощ" Height="20">
                                 <MenuItem Header="_Помощ" Height="20">
-                                    <MenuItem Header="_Има още много..." Height="20">
-                                        <MenuItem Header="_Излъгах" Height="20">
-                                        </MenuItem>
-                                    </MenuItem>
                                 </MenuItem>
                             </MenuItem>
                         </MenuItem>
@@ -58,14 +54,14 @@
         </Menu>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,0,0,0">
-            <TextBlock Width="40" Text="Бр" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="81" Text="ТИП СТАЯ" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="130" Text="НАСТАНЯВАНЕ" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="130" Text="НАПУСКАНЕ" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="90" Text="ИЗВЪН" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="90" Text="СЛАБ" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="90" Text="СИЛЕН" FontWeight="DemiBold" Foreground="White"/>
-            <TextBlock Width="90" Text="ОБЩО" FontWeight="DemiBold" Foreground="White"/>
+            <TextBlock Width="40" Text="Бр" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="81" Text="ТИП СТАЯ" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="130" Text="НАСТАНЯВАНЕ" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="130" Text="НАПУСКАНЕ" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="90" Text="ИЗВЪН" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="90" Text="СЛАБ" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="90" Text="СИЛЕН" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="90" Text="ОБЩО" Style="{StaticResource HeaderTextBlockStyle}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2">

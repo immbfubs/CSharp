@@ -28,5 +28,18 @@
                 </Setter.Value>
             </Setter>-->
         </Style>
+        <Style x:Key="HeaderTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="FloralWhite"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <!--<Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="White"
+                                      ShadowDepth="1"
+                                      BlurRadius="1"/>
+                </Setter.Value>
+            </Setter>-->
+        </Style>
     </Application.Resources>
 </Application>

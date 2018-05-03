@@ -216,7 +216,7 @@ namespace TotalAmount
 
         private void MenuClick_RoomTypes(object sender, RoutedEventArgs e)
         {
-            RoomTypess roomsWindow = new RoomTypess();
+            RoomTypes roomsWindow = new RoomTypes();
             roomsWindow.ShowDialog();
         }
 
