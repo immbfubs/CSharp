@@ -33,7 +33,7 @@ namespace SudokuSolver
         ///</summary>
         void UniqueCandidate()
         {
-            //CHECK QUADS
+            //CHECK BLOCKS
             for (int q = 1; q < 10; q++)
             {
                 string chain = "";
@@ -114,9 +114,9 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#2 (REMOVES) If only two cells in a block contain a digit and they share the same rown or column index, removes that digit from the possibilities for the other cells in that row/column. 
+        ///#2 (REMOVES) If only two cells in a block contain a digit and they share the same rown or column index, removes that digit from the candidates of the other cells in that row/column. 
         ///</summary>
-        void CorrectRowsColsViaBlocks()
+        void PointingPair()
         {
             for (int q = 1; q < 10; q++)
             {
@@ -166,7 +166,7 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#3 (REMOVES) If only two cells of a row/column contain a digit and they are in the same block, removes that digit from the possibilities of the other cells in that block.
+        ///#3 (REMOVES) If only two cells of a row/column contain a certain digit and they are in the same block, removes that digit from the candidates of the other cells in that block.
         ///</summary>
         void CorrectBlocksViaRowsCols()
         {
@@ -254,7 +254,7 @@ namespace SudokuSolver
         ///<summary>
         ///#4 (REMOVES) Checks if two connected cells contatin only two digits and if they are equal, trims these digits from the other connected cells.
         ///</summary>
-        void NakedSubset()
+        void NakedPair()
         {
             int[,] ctnr = new int[81, 2];
             int counter = 0;
@@ -342,12 +342,14 @@ namespace SudokuSolver
         }
 
         ///<summary>
-        ///#5 (REMOVES) Checks if two connected cells are the only one to contain two pairs of equal digits and trims the other possible digits
+        ///#5 (REWRITES) Checks if two connected cells are the only ones to have two specific candidates.
+        ///If found, leaves these candidates as their only candidates.
+        ///"change" variable must be handled, snice "strRemove" method is not used!
         ///</summary>
-        void HiddenSubset()
+        void HiddenPair()
         {
-            for (int i = 1; i < 10; i++)
             //ROWS
+            for (int i = 1; i < 10; i++)
             {
                 string concat = "";
                 for (int j = 1; j < 10; j++) concat += str[i, j];
@@ -370,33 +372,38 @@ namespace SudokuSolver
                             if (count == 2)
                             {
                                 count = 0;
-                                int j1, j2;
-                                j1 = j2 = 0;
+                                int j1 = 0;
                                 for (int j = 1; j < 10; j++)
                                 {
                                     if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
                                     {
-                                        if (count == 0) j1 = j;
-                                        if (count == 1) j2 = j;
                                         count++;
-                                    }
-                                }
-                                if (count == 2)
-                                {
-                                    for (int num = 1; num < 10; num++)
-                                    {
-                                        if (num != a && num != b)
+                                        if (count == 1) j1 = j;
+                                        if (count == 2)
                                         {
-                                            if (str[i, j1].Contains(num.ToString()))
+                                            if (str[i, j1].Length > 2 || str[i, j].Length > 2)
                                             {
-                                                StrRemove(i, j1, num);
-                                                methodNo[5]++;
+                                                str[i, j1] = str[i, j] = String.Concat(a, b);
+                                                change = true;
+                                                ///OLD BODY
+                                                ///for (int num = 1; num < 10; num++)
+                                                ///{
+                                                ///    if (num != a && num != b)
+                                                ///    {
+                                                ///        if (str[i, j1].Contains(num.ToString()))
+                                                ///        {
+                                                ///            StrRemove(i, j1, num);
+                                                ///            methodNo[5]++;
+                                                ///        }
+                                                ///        if (str[i, j].Contains(num.ToString()))
+                                                ///        {
+                                                ///            StrRemove(i, j, num);
+                                                ///            methodNo[5]++;
+                                                ///        }
+                                                ///    }
+                                                ///}
                                             }
-                                            if (str[i, j2].Contains(num.ToString()))
-                                            {
-                                                StrRemove(i, j2, num);
-                                                methodNo[5]++;
-                                            }
+                                            break;
                                         }
                                     }
                                 }
@@ -406,8 +413,8 @@ namespace SudokuSolver
                 }
             }
 
-            for (int j = 1; j < 10; j++)
             //COLS
+            for (int j = 1; j < 10; j++)
             {
                 string concat = "";
                 for (int i = 1; i < 10; i++) concat += str[i, j];
@@ -430,33 +437,83 @@ namespace SudokuSolver
                             if (count == 2)
                             {
                                 count = 0;
-                                int i1, i2;
-                                i1 = i2 = 0;
+                                int i1 = 0;
                                 for (int i = 1; i < 10; i++)
                                 {
                                     if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
                                     {
-                                        if (count == 0) i1 = i;
-                                        if (count == 1) i2 = i;
                                         count++;
+                                        if (count == 1) i1 = i;
+                                        if (count == 2)
+                                        {
+                                            if (str[i1, j].Length > 2 || str[i, j].Length > 2)
+                                            {
+                                                str[i1, j] = str[i, j] = String.Concat(a, b);
+                                                change = true;
+                                                methodNo[5]++;
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
-                                if (count == 2)
+                            }
+                        }
+                    }
+                }
+            }
+
+            //BLOCKS
+            for (int block = 1; block < 10; block++)
+            {
+                string concat = "";
+                //inlined or not is better for speed?
+                for (int n = 1; n < 10; n++)
+                {
+                    GetIndexes(block, n, out int i, out int j);
+                    concat += str[i, j];
+                }
+                for (int a = 1; a < 10; a++)
+                {
+                    short count = 0;
+                    foreach (char c in concat)
+                    {
+                        if (c.ToString() == a.ToString()) count++;
+                    }
+                    if (count == 2)
+                    {
+                        for(int b = a + 1; b < 10; b++)
+                        {
+                            count = 0;
+                            foreach(char c in concat)
+                            {
+                                if (c.ToString() == b.ToString()) count++;
+                            }
+                            
+                            if (count == 2)
+                            {
+                                count = 0;
+                                int i, j, i1, j1;
+                                i = j = i1 = j1 = 0;
+                                for (int n = 1; n < 10; n++)
                                 {
-                                    for (int num = 1; num < 10; num++)
+                                    GetIndexes(block, n, out i, out j);
+                                    if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
                                     {
-                                        if (num != a && num != b)
+                                        count++;
+                                        if (count == 1)
                                         {
-                                            if (str[i1, j].Contains(num.ToString()))
+                                            i1 = i;
+                                            j1 = j;
+                                        }
+                                        if (count == 2)
+                                        {
+                                            if (str[i1, j1].Length > 2 || str[i, j].Length > 2)
                                             {
-                                                StrRemove(i1, j, num);
+                                                str[i1, j1] = str[i, j] = String.Concat(a, b);
+                                                change = true;
                                                 methodNo[5]++;
                                             }
-                                            if (str[i2, j].Contains(num.ToString()))
-                                            {
-                                                StrRemove(i2, j, num);
-                                                methodNo[5]++;
-                                            }
+                                            break;
                                         }
                                     }
                                 }
@@ -573,7 +630,7 @@ namespace SudokuSolver
         ///Before that stores the puzzle progress to restore it in case of failure.
         ///On failure restores the sudoku before the filling of the cell and fills in the second possible number.
         ///It will try to guess the right number of as many cells as needed to solve the puzzle.
-        ///If it fails to find a cell with two possible entries the sudoku won't be solved.
+        ///If it fails to find a cell with exactly two candidates the sudoku won't be solved.
         ///</summary>
         void TryToCheat()
         {
@@ -593,24 +650,26 @@ namespace SudokuSolver
                     }
                 }
             }
-            dp = dp + "\n(" + i.ToString() + j.ToString() + ") ";
+
             if (i != 0)
             {
                 int filledOld = filled;
                 Array.Copy(arr, oldArr, arr.Length);
                 Array.Copy(str, oldStr, str.Length);
+                dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + str[i, j][0] + ") ";
                 Fill(i, j, int.Parse(str[i, j][0].ToString()));
 
-                TryToSolve();
+                bool proceed = TryToSolve();
 
-                if (filled < 81)
+                if (filled < 81 || proceed)
                 {
                     Restore(oldArr, oldStr, filledOld);
+                    dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + str[i, j][1] + ") ";
                     Fill(i, j, int.Parse(str[i, j][1].ToString()));
-                    TryToSolve();
+                    proceed = TryToSolve();
                 }
 
-                if (filled < 81)
+                if (filled < 81 || proceed)
                 {
                     Restore(oldArr, oldStr, filledOld);
                 }

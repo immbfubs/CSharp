@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="Калкулатор на резервации"
         ResizeMode="NoResize"
-        Height="350"
-        Width="800"
+        Height="400"
+        Width="1000"
         FontSize="14">
 
     <Window.Background>
@@ -22,6 +22,17 @@
         <Style x:Key="Out" TargetType="{x:Type TextBlock}"/>
         <Style x:Key="Low" TargetType="{x:Type TextBlock}"/>
         <Style x:Key="High" TargetType="{x:Type TextBlock}"/>
+        <Style x:Key="Item" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="GreenYellow"/>
+                    <!--WPF the following is not working?-->
+                    <Setter Property="BorderBrush" Value="Red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -35,8 +46,8 @@
             <MenuItem Header="_File" Height="20">
             </MenuItem>
             <MenuItem Header="_Настройки" Height="20">
-                <MenuItem Header="_Сезони" Height="20" Click="MenuClick_Seassons"/>
                 <MenuItem Header="_Типове стаи" Height="20" Click="MenuClick_RoomTypes"/>
+                <MenuItem Header="Други настройки" Height="20" Click="MenuClick_Settings"/>
                 <MenuItem Header="_Рестартирай файла с настройките" Height="20" Click="MenuClick_ResetSettingsFile"/>
             </MenuItem>
             <MenuItem Header="_Помощ" Height="20">
@@ -61,7 +72,10 @@
             <TextBlock Width="90" Text="ИЗВЪН" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Width="90" Text="СЛАБ" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Width="90" Text="СИЛЕН" Style="{StaticResource HeaderTextBlockStyle}"/>
-            <TextBlock Width="90" Text="ОБЩО" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="110" Text="ОБЩО" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="50" Text="12+" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="70" Text="до 12г" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="100" Text="% отстъпка" Style="{StaticResource HeaderTextBlockStyle}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2">
@@ -69,8 +83,8 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Quantity}" Width="40"/>
-                            <TextBlock Text="{Binding Name}" Width="80"/>
+                            <TextBox Text="{Binding Quantity}" Style="{DynamicResource Item}" Width="30" KeyDown="TextBox_KeyDown"/>
+                            <TextBlock Text="{Binding Name}" Width="80" Margin="10,0,0,0"/>
                             <TextBlock Text="{Binding CheckInDate, StringFormat='{}{0:dd / MM}'}" Width="131"/>
                             <TextBlock Text="{Binding CheckOutDate, StringFormat='{}{0:dd / MM}'}" Width="131"/>
                             <StackPanel Width="90" Orientation="Horizontal">
@@ -89,6 +103,9 @@
                                 <TextBlock Text="{Binding Price[3]}" Width="Auto"/>
                                 <TextBlock Text="{Binding Days[3], StringFormat={}({0})}" Width="Auto" Margin="7,0,0,0" Foreground="RoyalBlue"/>
                             </StackPanel>
+                            <TextBox Width="30" Margin="15,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsBig}" KeyDown="TextBox_KeyDown"/>
+                            <TextBox Width="40" Margin="20,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsSmall}" KeyDown="TextBox_KeyDown"/>
+                            <TextBox Width="70" Margin="30,0,0,0" Style="{DynamicResource Item}" Text="{Binding Discount}" KeyDown="TextBox_KeyDown"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -134,7 +151,8 @@
                     <TextBlock FontSize="16" Foreground="#FF1F37A4" Margin="10,0,10,0">ИЗЧИСТИ</TextBlock>
                 </Button.Content>
             </Button>
-            <TextBlock Margin="260,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ОБЩА СТОЙНОСТ НА РЕЗЕРВАЦИЯТА:</TextBlock>
+            <TextBlock Name="tester"></TextBlock>
+            <TextBlock Margin="440,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ОБЩА СТОЙНОСТ НА РЕЗЕРВАЦИЯТА:</TextBlock>
             <TextBlock Name="TbTotal" Margin="10,0,0,0" Style="{StaticResource TotalTextBlockStyle}">0</TextBlock>
             <TextBlock Margin="5,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ЛВ</TextBlock>
         </StackPanel>

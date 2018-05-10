@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TotalAmount"
         mc:Ignorable="d"
-        Title="RoomTypess" Height="400" Width="500">
+        Title="RoomTypess" Height="400" Width="560">
     <Window.Resources>
         <Style TargetType="ListBoxItem">
             <Style.Triggers>
@@ -41,7 +41,13 @@
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBox Text="{Binding Name}"
-                                 Width="190"
+                                 Width="192"
+                                 Background="Transparent"
+                                 BorderBrush="Transparent"
+                                 GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                 LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                        <TextBox Text="{Binding Guests}"
+                                 Width="80"
                                  Background="Transparent"
                                  BorderBrush="Transparent"
                                  GotKeyboardFocus="TextBox_GotKeyboardFocus"
@@ -70,15 +76,16 @@
         </ListBox>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="ТИП" Width="190" Margin="10, 0, 0, 0" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Text="ЗАЕТОСТ" Width="80" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Text="ИЗВЪН" Width="80" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Text="СЛАБ" Width="80" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Text="СИЛЕН" Width="80" Style="{StaticResource HeaderTextBlockStyle}"/>
         </StackPanel>
         <DockPanel Grid.Row="2">
-            <Button Content="Добави" Width="70" Margin="10, 0, 0, 0" HorizontalAlignment="Left"/>
+            <!--<Button Content="Добави" Width="70" Margin="10, 0, 0, 0" HorizontalAlignment="Left"/>
             <Button Content="Нагоре" Width="70" Margin="10, 0, 0, 0" HorizontalAlignment="Left"/>
-            <Button Content="Надолу" Width="70" Margin="10, 0, 0, 0" HorizontalAlignment="Right"/>
-            <TextBlock Name="tester" Text="Tester" Width="Auto" Margin="10, 0, 0, 0"/>
+            <Button Content="Надолу" Width="70" Margin="10, 0, 0, 0" HorizontalAlignment="Right"/>-->
+            <TextBlock Name="tester" Text="" Width="Auto" Margin="50, 0, 0, 0" Foreground="MediumVioletRed" FontSize="16" VerticalAlignment="Center"/>
             <Button Content="Запази" Width="70" Margin="10, 0, 10, 0" HorizontalAlignment="Right" Click="SaveButton_Click"/>
         </DockPanel>
     </Grid>

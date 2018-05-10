@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace TotalAmount
 {
@@ -17,7 +18,37 @@ namespace TotalAmount
     public partial class MainWindow : Window
     {
         public static XDocument xDoc;
-        public static Dictionary<string, decimal[]> rooms = new Dictionary<string, decimal[]>();
+        public struct Room
+        {
+            public byte Guests { get; set; }
+            public decimal Out { get; set; }
+            public decimal Low { get; set; }
+            public decimal High { get; set; }
+
+            public Room(byte g, decimal o, decimal l, decimal h)
+            {
+                this.Guests = g;
+                this.Out = o;
+                this.Low = l;
+                this.High = h;
+            }
+        }
+        public static Dictionary<string, Room> rooms = new Dictionary<string, Room>();
+        public enum Reason
+        {
+            newFile,
+            syntaxError,
+            pricesError,
+            datesError,
+            notify
+        }
+        public enum Setting {
+            addBedSmallPrice,
+            addBedBigPrice
+            }
+
+        //Lentgth of Settings should be bigger than Setting biggest value
+        public int[] Settings = new int[5];
         public struct Seasson
         {
             public int day;
@@ -27,7 +58,11 @@ namespace TotalAmount
         public Seasson[] seassons = new Seasson[5];
         public Reservation Reservation { get; } = new Reservation();
 
-        public int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8 };
+        /// <summary>
+        /// binding array for rooms quantity ComboBox
+        /// </summary>
+        public int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
         public MainWindow()
         {
             LoadSettingsFile();
@@ -35,6 +70,7 @@ namespace TotalAmount
             DataContext = this;
             LoadRoomTypes();
             LoadDates();
+            LoadSettings();
             cbQuantity.ItemsSource = arr.ToArray();
             #region
             //can set ItemSource directly to rooms.Keys since it returns a collection
@@ -48,7 +84,7 @@ namespace TotalAmount
         {
             if (!File.Exists(App.settingsXml))
             {
-                ResetSettings(0);
+                ResetSettings(Reason.newFile);
             }
             else
             {
@@ -58,15 +94,16 @@ namespace TotalAmount
                 }
                 catch
                 {
-                    ResetSettings(1);
+                    ResetSettings(Reason.syntaxError);
                 }
             }
         }
 
-        //Loading room types and prices from the file into rooms dictionary
-        public void LoadRoomTypes()
+        /// <summary>Loading room types and prices from the file into rooms dictionary.</summary>
+        /// <returns>Returns true if the settings file has been reset</returns>
+        public bool LoadRoomTypes()
         {
-            bool reload;
+            bool reload, fileReset = false;
             do
             {
                 reload = false;
@@ -76,25 +113,29 @@ namespace TotalAmount
                                 select new
                                 {
                                     name = i.Value,
+                                    guests = i.Attribute("guests").Value,
                                     _out = i.Attribute("out").Value,
                                     low = i.Attribute("low").Value,
                                     high = i.Attribute("high").Value
                                 };
+                    rooms.Clear();
                     foreach (var i in types)
                     {
-                        decimal[] arr = new decimal[3];
-                        arr[0] = decimal.Parse(i._out);
-                        arr[1] = decimal.Parse(i.low);
-                        arr[2] = decimal.Parse(i.high);
-                        rooms.Add(i.name.ToString(), arr);
+                        Room r = new Room(
+                            byte.Parse(i.guests),
+                            decimal.Parse(i._out),
+                            decimal.Parse(i.low),
+                            decimal.Parse(i.high));
+                        rooms.Add(i.name.ToString(), r);
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    ResetSettings(2);
-                    reload = true;
+                    ResetSettings(Reason.pricesError);
+                    reload = fileReset = true;
                 }
             } while (reload);
+            return fileReset;
         }
 
         //Loading the beginning dates of every seasson
@@ -126,7 +167,35 @@ namespace TotalAmount
                 }
                 catch
                 {
-                    ResetSettings(3);
+                    ResetSettings(Reason.datesError);
+                    reload = true;
+                }
+            } while (reload);
+        }
+
+        //Loading program settings
+        public void LoadSettings()
+        {
+            bool reload;
+            do
+            {
+                reload = false;
+                try
+                {
+                    var xDocSettings = from item in xDoc.Descendants("Setting")
+                                       select new
+                                       {
+                                           name = item.Value,
+                                           option = item.Attribute("option").Value
+                                       };
+                    foreach (var i in xDocSettings)
+                    {
+                        Settings[int.Parse(i.name)] = int.Parse(i.option);
+                    }
+                }
+                catch
+                {
+                    ResetSettings(Reason.syntaxError);
                     reload = true;
                 }
             } while (reload);
@@ -150,7 +219,7 @@ namespace TotalAmount
         }
 
         //btnAdd_Click invokes this method which checks if the selected period is valid
-        private bool IsCorrectPeriodPicked()
+        private bool IsCorrectPeriodPicked()      
         {
             if (dpCheckIn.SelectedDate != null && dpCheckOut.SelectedDate != null)
             {
@@ -205,7 +274,7 @@ namespace TotalAmount
             Reservation.TotalRefresh();
         }
 
-        private void MenuClick_Seassons(object sender, RoutedEventArgs e)
+        private void MenuClick_Settings(object sender, RoutedEventArgs e)
         {
             SeassonsWindow seassonsWindow = new SeassonsWindow();
             seassonsWindow.ShowDialog();
@@ -223,46 +292,75 @@ namespace TotalAmount
         private void MenuClick_ResetSettingsFile(object sender, RoutedEventArgs e)
         {
             var message = MessageBox.Show("Всички сезони и цени ще бъдат рестартирани на първоначално зададените!\nСигурни ли сте?", "Внимание!", MessageBoxButton.YesNo);
-            if (message == MessageBoxResult.Yes) ResetSettings(10);
+            if (message == MessageBoxResult.Yes) ResetSettings(Reason.notify);
         }
 
-        private void ResetSettings(int sender)
+        private void ResetSettings(Reason r)
         {
-            string path = @"settings.xml";
             try
             {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-                using (FileStream fs = File.Create(path))
-                {
-                    Byte[] info = new UTF8Encoding(true).GetBytes("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Settings>\n<!--Values must be decimals since decimal.TryParse is used!The rooms count can vary-->\n<Room low=\"99\" high=\"119\" out=\"59\">DBL</Room>\n<Room low=\"119\" high=\"149\" out=\"79\">DBLSV</Room>\n<Room low=\"109\" high=\"139\" out=\"69\">DBLsSV</Room>\n<Room low=\"0\" high=\"0\" out=\"0\">----</Room>\n<Room low=\"79\" high=\"99\" out=\"49\">SNGL</Room>\n<Room low=\"99\" high=\"119\" out=\"69\">SNGLSV</Room>\n<Room low=\"89\" high=\"109\" out=\"59\">SNGLsSV</Room>\n<Room low=\"0\" high=\"0\" out=\"0\">-----</Room>\n<Room low=\"149\" high=\"189\" out=\"99\">TRPL</Room>\n<Room low=\"0\" high=\"0\" out=\"0\">------</Room>\n<Room low=\"199\" high=\"249\" out=\"159\">AP3</Room>\n<Room low=\"199\" high=\"249\" out=\"159\">AP4</Room>\n<Room low=\"249\" high=\"299\" out=\"239\">PresAP</Room>\n<!--Values must be integers since int.Parse is used!Exactly 4 dates must be defined!-->\n<Date day=\"1\" month=\"7\">Силен летен</Date>\n<Date day=\"1\" month=\"10\">Извън есзона</Date>\n<Date day=\"16\" month=\"9\">Слаб летен - есен</Date>\n<Date day=\"25\" month=\"5\">Слаб летен - пролет</Date>\n</Settings>");
-                    fs.Write(info, 0, info.Length);
-                }
-                xDoc = XDocument.Load(App.settingsXml);
+                //string path = @"settings.xml";
+                //if (File.Exists(path))
+                //{
+                //    File.Delete(path);
+                //}
+                
+                xDoc = new XDocument(
+                            new XDeclaration("1.0", "utf-16", "true"),
+                            new XElement("Settings",
+                                new XComment("Values must be decimals since decimal.TryParse is used!The rooms count can vary"),
+                                new XElement("Room", "DBL", new XAttribute("guests", 2), new XAttribute("low", 99), new XAttribute("high", "119"), new XAttribute("out", "59")),
+                                new XElement("Room", "DBLSV", new XAttribute("guests", 2), new XAttribute("low", 119), new XAttribute("high", "149"), new XAttribute("out", "79")),
+                                new XElement("Room", "DBLsSV", new XAttribute("guests", 2), new XAttribute("low", 109), new XAttribute("high", "139"), new XAttribute("out", "69")),
+                                new XElement("Room", "---------", new XAttribute("guests", 0), new XAttribute("low", 0), new XAttribute("high", "0"), new XAttribute("out", "0")),
+                                new XElement("Room", "SNGL", new XAttribute("guests", 1), new XAttribute("low", 79), new XAttribute("high", "99"), new XAttribute("out", "49")),
+                                new XElement("Room", "SNGLSV", new XAttribute("guests", 1), new XAttribute("low", 99), new XAttribute("high", "119"), new XAttribute("out", "69")),
+                                new XElement("Room", "SNGLsSV", new XAttribute("guests", 1), new XAttribute("low", 89), new XAttribute("high", "109"), new XAttribute("out", "59")),
+                                new XElement("Room", "--------", new XAttribute("guests", 0), new XAttribute("low", 0), new XAttribute("high", "0"), new XAttribute("out", "0")),
+                                new XElement("Room", "TRPL", new XAttribute("guests", 3), new XAttribute("low", 149), new XAttribute("high", "189"), new XAttribute("out", "99")),
+                                new XElement("Room", "-------", new XAttribute("guests", 0), new XAttribute("low", 0), new XAttribute("high", "0"), new XAttribute("out", "0")),
+                                new XElement("Room", "AP3", new XAttribute("guests", 4), new XAttribute("low", 199), new XAttribute("high", "249"), new XAttribute("out", "159")),
+                                new XElement("Room", "AP4", new XAttribute("guests", 4), new XAttribute("low", 199), new XAttribute("high", "249"), new XAttribute("out", "159")),
+                                new XElement("Room", "PresAP", new XAttribute("guests", 4), new XAttribute("low", 249), new XAttribute("high", "299"), new XAttribute("out", "239")),
+                                new XComment("Values must be integers since int.Parse is used!Exactly 4 dates must be defined!"),
+                                new XElement("Date", "Силен летен", new XAttribute("day", 1), new XAttribute("month", 7)),
+                                new XElement("Date", "Извън есзона", new XAttribute("day", 1), new XAttribute("month", 10)),
+                                new XElement("Date", "Слаб летен - есен", new XAttribute("day", 16), new XAttribute("month", 9)),
+                                new XElement("Date", "Слаб летен - пролет", new XAttribute("day", 25), new XAttribute("month", 5)),
+                                new XElement("Setting", (int)Setting.addBedBigPrice, new XAttribute("option", 35)),
+                                new XElement("Setting", (int)Setting.addBedSmallPrice, new XAttribute("option", 30))));
+                xDoc.Save(App.settingsXml);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-            switch (sender)
+            switch (r)
             {
-                case 0:
+                case Reason.newFile:
                     MessageBox.Show("Нов файлй с настройки беше създаден.");
                     break;
-                case 1:
+                case Reason.syntaxError:
                     MessageBox.Show("Файлът с настройки беше рестартиран поради грешка в текста.");
                     break;
-                case 2:
+                case Reason.pricesError:
                     MessageBox.Show("Файлът с настройки беше рестартиран, защото една или повече от ценните не бяха зададена коректно.");
                     break;
-                case 3:
+                case Reason.datesError:
                     MessageBox.Show("Файлът с настройки беше рестартиран, защото една или повече от началните дати на сезоните не бяха зададени коректно.");
                     break;
                 default:
                     MessageBox.Show("Файлът с настройките беше рестартиран.\nВсички дати, типове стаи и цени бяха рестартирани!");
                     break;
+            }
+        }
+
+        private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                Keyboard.ClearFocus();
             }
         }
     }

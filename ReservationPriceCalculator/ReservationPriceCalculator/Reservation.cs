@@ -12,6 +12,8 @@ namespace TotalAmount
     {
         public decimal Total { get; set; }
 
+        //If an item with the same name, checkIn and checkOut dates exists,
+        //it only adds the new item's quantity to the existing item's quantity
         public void AddToReservation(Item itm)
         {
             bool newItem = true;
@@ -25,10 +27,12 @@ namespace TotalAmount
             }
             if (newItem) this.Add(itm);
             TotalRefresh();
-
         }
 
-        //This method also looks after the empty pirce columns and hides them
+        //This method also looks after the empty pirce columns and hides them.
+        //When item is added to reservarion this method is called twice.
+        //Once from this.AddToReservation() and once from the Item.Quantity setter.
+        //Is it possible to avoid that?
         public void TotalRefresh()
         {
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;

@@ -28,7 +28,7 @@ namespace SudokuSolver
             Populate();
         }
 
-        void TryToSolve()
+        bool TryToSolve()
         {
             dp = dp + depth.ToString()+" ";
             do
@@ -36,15 +36,27 @@ namespace SudokuSolver
                 change = false;
                 SoleCandidate();
                 UniqueCandidate();
-                CorrectRowsColsViaBlocks();
-                NakedSubset();
+                PointingPair();
+                NakedPair();
                 CorrectBlocksViaRowsCols();
                 FindHook();
-                HiddenSubset();
+                HiddenPair();
             } while (change && filled != 81);
 
             if (filled == 81)
             {
+                FillTextBoxes();
+                label1.Text = "Solved!";
+                dp += "\n\nSolved!\n";
+
+                var findNextSolution = MessageBox.Show("Try to find another soluitons?", "Shall we continue?", MessageBoxButtons.YesNo);
+                if (findNextSolution == DialogResult.Yes)
+                {
+                    label1.Text = "Working!";
+                    //Render the label1 text first!
+                    Application.DoEvents();
+                    return true;
+                }
                 //MessageBox.Show(
                 //"SoleCandidate() succeeded " + methodNo[0].ToString() + " times\n"
                 //+ "UniqueCandidate() succeeded " + methodNo[1].ToString() + " times\n"
@@ -53,15 +65,17 @@ namespace SudokuSolver
                 //+ "CorrectBlocksViaRowsCols() succeeded " + methodNo[3].ToString() + " times\n"
                 //+ "HiddenSubset() succeeded " + methodNo[5].ToString() + " times\n"
                 //+ "FindHook() succeeded " + methodNo[6].ToString() + " times\n");
-                label1.Text = "Solved!";
             }
-
-            if (filled < 81 && error == false)
+            else if (error == false)
             {
                 TryToCheat();
             }
-
-            if (error) { dp = dp + "e "; }
+            else
+            {
+                dp = dp + "e ";
+                label1.Text = "No solution found!";
+            }
+            return false;
         }
 
         //Fills the array values into the text boxes after trySolve() has finished
@@ -77,14 +91,6 @@ namespace SudokuSolver
                     }
                 }
             }
-        }
-
-        //Finds the indexes of the given TextBox object
-        void FindTextBoxIJ(TextBox tb, out int i, out int j)
-        {
-            double.TryParse(tb.Name.Substring(7), out double num);
-            i = (int)Math.Ceiling(num / 9d);
-            j = Convert.ToInt32(num - ((i - 1) * 9));
         }
         
         //Fills a value in arr[i,j]
@@ -102,7 +108,7 @@ namespace SudokuSolver
         {
             TextBox tb = (TextBox)sender;
 
-            FindTextBoxIJ(tb, out int i, out int j);
+            GetTextBoxIndexes(tb, out int i, out int j);
             if (!int.TryParse(tb.Text, out int num))
             {
                 tb.ResetText();
@@ -116,7 +122,7 @@ namespace SudokuSolver
             load.Text = "Filled: "+filled.ToString();
         }
 
-        //(REMOVES)
+        //(REMOVES) Executes for every resolved cell
         void CorrectNeighbors(int x, int y, int num)
         {
             //ROWS COLS
@@ -192,6 +198,30 @@ namespace SudokuSolver
             return (a*3 + b);
         }
 
+        //Gets the indexes of a cell, given its block number (1-9) and its number in the block (1-9)
+        void GetIndexes(int b, int n, out int i, out int j)
+        {
+            i = (int)Math.Ceiling((double)b / 3) * 3 - 2;
+            i += (int)Math.Ceiling((double)n / 3) - 1;
+
+            Math.DivRem(b, 3, out j);
+            if (j == 0) j = 7;
+            if (j == 2) j = 4;
+            Math.DivRem(n, 3, out n);
+            if (n > 0) n -= 1;
+            else n += 2;
+
+            j += n;
+        }
+
+        //Finds the indexes of the given TextBox object
+        void GetTextBoxIndexes(TextBox tb, out int i, out int j)
+        {
+            double.TryParse(tb.Name.Substring(7), out double num);
+            i = (int)Math.Ceiling(num / 9d);
+            j = Convert.ToInt32(num - ((i - 1) * 9));
+        }
+
         //Gets a TextBox object given its indexes
         TextBox GetTextBox(int i, int j)
         {
@@ -214,7 +244,7 @@ namespace SudokuSolver
             if (str[i, j].Length < 1)
             {
                 error = true;
-                GetTextBox(i, j).BackColor = Color.Red;
+                //GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
@@ -225,7 +255,7 @@ namespace SudokuSolver
             if (str[i, j].Length < 1)
             {
                 error = true;
-                GetTextBox(i, j).BackColor = Color.Red;
+                //GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
@@ -236,14 +266,16 @@ namespace SudokuSolver
             if (str[i, j].Length < 1)
             {
                 error = true;
-                GetTextBox(i, j).BackColor = Color.Red;
+                //GetTextBox(i, j).BackColor = Color.Red;
             }
         }
 
         void solve_Click(object sender, EventArgs e)
         {
+            label1.Text = "Working!";
+            //Render the label1 text first!
+            Application.DoEvents();
             TryToSolve();
-            FillTextBoxes();
         }
 
         void load_Click(object sender, EventArgs e)
@@ -256,6 +288,9 @@ namespace SudokuSolver
                 {
                     string file = openFileDialog1.FileName;
                     text = File.ReadAllText(file);
+                    text = text.Replace("\n", String.Empty);
+                    text = text.Replace("\r", String.Empty);
+                    text = text.Replace("\t", String.Empty);
                     load.Enabled = false;
                     load.BackColor = Color.White;
                 }
@@ -275,25 +310,26 @@ namespace SudokuSolver
                     }
                     else
                     {
+                        MessageBox.Show(text);
                         symbolEncountered = true;
                     }
                 }
                 if(counter != 81 && symbolEncountered) MessageBox.Show("The length of the file is different from 81.\nA symbol different than a number was encountered.\nMake sure that the sudoku is introduced correctly!");
                 else if (counter != 81) MessageBox.Show("The length of the file is different from 81.\nMake sure that the sudoku is introduced correctly!");
-                else if (symbolEncountered) MessageBox.Show("A symbol different than a number was encountered.\nMake sure that the sudoku is introduced correctly!\n\nWHY IS THIS HAPPENING?!?");
+                else if (symbolEncountered) MessageBox.Show("A symbol different than a number was encountered.\nMake sure that the sudoku is introduced correctly!");
             }
         }
 
         void tb_click(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            FindTextBoxIJ(tb, out int i, out int j);
+            GetTextBoxIndexes(tb, out int i, out int j);
             label1.Text = str[i, j].ToString();
         }
         
         void newWin_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(dp.ToString());
+            //MessageBox.Show(dp.ToString());
             System.Diagnostics.Process.Start(Application.ExecutablePath);    //start new instance of application
             this.Close();
         }

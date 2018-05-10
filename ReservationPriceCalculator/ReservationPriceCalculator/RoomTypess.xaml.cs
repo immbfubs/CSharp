@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Windows;
@@ -22,13 +23,15 @@ namespace TotalAmount
         private struct Room
         {
             public string Name { get; set; }
+            public string Guests { get; set; }
             public string Out { get; set; }
             public string Low { get; set; }
             public string High { get; set; }
 
-            public Room(string n, string o, string l, string h)
+            public Room(string n, string g, string o, string l, string h)
             {
                 this.Name = n;
+                this.Guests = g;
                 this.Out = o;
                 this.Low = l;
                 this.High = h;
@@ -42,6 +45,7 @@ namespace TotalAmount
             LoadData();
             InitializeComponent();
             lbRoomTypes.ItemsSource = this.RoomsList;
+            
         }
 
         private void LoadData()
@@ -50,7 +54,7 @@ namespace TotalAmount
                      select item;
             foreach (var room in xRooms)
             {
-                Room r = new Room(room.Value, room.Attribute("out").Value, room.Attribute("low").Value, room.Attribute("high").Value);
+                Room r = new Room(room.Value, room.Attribute("guests").Value, room.Attribute("out").Value, room.Attribute("low").Value, room.Attribute("high").Value);
                 RoomsList.Add(r);
             }
         }
@@ -58,14 +62,18 @@ namespace TotalAmount
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             xDoc.Save(App.settingsXml);
+            mainWindow.LoadSettingsFile();
+            bool error = mainWindow.LoadRoomTypes();
+            if(!error) tester.Text = "Запазено";
+                else MessageBox.Show("Моля коригирайте въведените данни и натиснете \"Запази\" отново!", "Внимание!");
         }
 
         private void TextBox_GotKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
         {
-
             oldValue = ((TextBox)sender).Text;
             lbRoomTypes.SelectedIndex = -1;
             GetListViewFromChild((DependencyObject)sender).IsSelected = true;
+            tester.Text = "";
         }
 
         private void TextBox_LostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
@@ -84,7 +92,6 @@ namespace TotalAmount
                 {
                     if (room.Value == textBoxText[0] || room.Value == oldValue)
                     {
-                        tester.Text = room.Value;
                         room.Value = textBoxText[0];
                         room.Attribute("out").Value = textBoxText[1];
                         room.Attribute("low").Value = textBoxText[2];
@@ -102,6 +109,11 @@ namespace TotalAmount
             if (parent == null) return null;
             if (parent is ListBoxItem) return parent as ListBoxItem;
             return GetListViewFromChild(parent);
+        }
+
+        private void TextBlock_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            //if(e.Key == System.Windows.Input.Key.Enter) ((TextBox).)
         }
     }
 }

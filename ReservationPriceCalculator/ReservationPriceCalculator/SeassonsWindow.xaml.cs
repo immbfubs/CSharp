@@ -25,8 +25,7 @@ namespace TotalAmount
         XmlDocument doc = new XmlDocument();
         string[] seassons = new string[5];
         string[] months = { "Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември" };
-        int oldDay;
-        int oldMonth;
+
         public SeassonsWindow()
         {
             InitializeComponent();
