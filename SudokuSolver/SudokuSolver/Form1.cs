@@ -8,14 +8,14 @@ namespace SudokuSolver
     public partial class Form1 : Form
     {
         int[] methodNo = { 0, 0, 0, 0, 0, 0, 0 };
-        int filled, depth;
+        int filled, depth, solutionsCounter;
         //[i, j]
         int[,] arr = new int[10, 10];
         //[i, j]
         string[,] str = new string[10, 10];
         //[block_No, box_No, i_j_indexes]
         int[,,] block = new int[10, 10, 2];
-        bool change, error;
+        bool change, error, counting;
         string dp;
 
         public Form1()
@@ -23,7 +23,7 @@ namespace SudokuSolver
             dp = "";
             filled = 0;
             depth = 0;
-            error = false;
+            error = counting = false;
             InitializeComponent();
             Populate();
         }
@@ -45,16 +45,40 @@ namespace SudokuSolver
 
             if (filled == 81)
             {
+                solutionsCounter++;
+                if (counting) return true;
+
                 FillTextBoxes();
                 label1.Text = "Solved!";
                 dp += "\n\nSolved!\n";
 
-                var findNextSolution = MessageBox.Show("Try to find another soluitons?", "Shall we continue?", MessageBoxButtons.YesNo);
-                if (findNextSolution == DialogResult.Yes)
+                //Yes - find next
+                //OK - count all
+                var whatNextWindow = new WhatNext();
+                var whatNext = whatNextWindow.ShowDialog();
+                if (whatNext == DialogResult.Yes)
                 {
+                    if(depth == 0)
+                    {
+                        label1.Text = "This puzzle has a single solution!";
+                        return true;
+                    }
                     label1.Text = "Working!";
                     //Render the label1 text first!
                     Application.DoEvents();
+                    return true;
+                }
+                if (whatNext == DialogResult.OK)
+                {
+                    if (depth == 0)
+                    {
+                        label1.Text = "This puzzle has a single solution!";
+                        return true;
+                    }
+                    label1.Text = "Working!";
+                    //Render the label1 text first!
+                    Application.DoEvents();
+                    counting = true;
                     return true;
                 }
                 //MessageBox.Show(
@@ -73,7 +97,30 @@ namespace SudokuSolver
             else
             {
                 dp = dp + "e ";
-                label1.Text = "No solution found!";
+            }
+
+            if(depth == 0)
+            {
+                if (counting)
+                {
+                    if (solutionsCounter == 1)
+                    {
+                        label1.Text = "This is the only solution!";
+                    }
+                    else if (solutionsCounter == 2)
+                    {
+                        label1.Text = "1 more solution was found!";
+                    }
+                    else
+                    {
+                        label1.Text = (solutionsCounter - 1).ToString() + " more solutions were found!";
+                    }
+                }
+                else
+                {
+                    if (solutionsCounter == 0) MessageBox.Show("I failed");
+                    else if (filled < 81) label1.Text = "No more solutions were found!";
+                }
             }
             return false;
         }
@@ -329,9 +376,18 @@ namespace SudokuSolver
         
         void newWin_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show(dp.ToString());
             System.Diagnostics.Process.Start(Application.ExecutablePath);    //start new instance of application
             this.Close();
+        }
+
+        void label1_Click(object sender, EventArgs e)
+        {
+            string[] lines = dp.Split(
+                    new[] { "\r\n", "\r", "\n" },
+                    StringSplitOptions.None
+            );
+            Report reportWindow = new Report(lines);
+            reportWindow.Show();
         }
     }
 }

@@ -1130,13 +1130,14 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(0, 13);
             this.label1.TabIndex = 85;
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(234, 294);
+            this.ClientSize = new System.Drawing.Size(234, 292);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.newWin);
             this.Controls.Add(this.load);
