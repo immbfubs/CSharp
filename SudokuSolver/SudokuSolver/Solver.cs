@@ -19,10 +19,9 @@ namespace SudokuSolver
             {
                 for (int j = 1; j < 10; j++)
                 {
-                    if (str[i, j].Length == 1)
+                    if (candidates[i, j, 0] == 1)
                     {
-                        Fill(i, j, int.Parse(str[i, j]));
-                        methodNo[0]++;
+                        Fill(i, j, candidates.Last(i, j));
                     }
                 }
             }
@@ -33,26 +32,25 @@ namespace SudokuSolver
         ///</summary>
         void UniqueCandidate()
         {
+            lastMethod = 1;
             //CHECK BLOCKS
             for (int q = 1; q < 10; q++)
             {
-                string chain = "";
-
-                for (int n = 1; n < 10; n++)
+                for (int cand = 1; cand < 10; cand++)
                 {
-                    chain = chain + str[block[q, n, 0], block[q, n, 1]];
-                }
-
-                for (int num = 1; num < 10; num++)
-                {
-                    int idx = chain.IndexOf(num.ToString());
-                    if (idx != -1 && chain.IndexOf(num.ToString(), idx + 1) == -1)
+                    byte counter = 0;
+                    for(int cell = 1; cell < 10; cell++)
                     {
-                        for (int i = 1; i < 10; i++)
+                        if (candidates[block[q, cell, 0], block[q, cell, 1], cand] == 0) counter++;
+                    }
+
+                    if(counter == 1)
+                    {
+                        for (int cell = 1; cell < 10; cell++)
                         {
-                            if (str[block[q, i, 0], block[q, i, 1]].Contains(num.ToString()))
+                            if (candidates[block[q, cell, 0], block[q, cell, 1], cand] == 0)
                             {
-                                Fill(block[q, i, 0], block[q, i, 1], num);
+                                Fill(block[q, cell, 0], block[q, cell, 1], cand);
                                 methodNo[1]++;
                             }
                         }
@@ -63,23 +61,22 @@ namespace SudokuSolver
             //CHECK ROWS
             for (int i = 1; i < 10; i++)
             {
-                string chain = "";
-
-                for (int j = 1; j < 10; j++)
+                for (int cand = 1; cand < 10; cand++)
                 {
-                    chain = chain + str[i, j];
-                }
+                    byte counter = 0;
+                    for (int j = 1; j < 10; j++)
+                    {
+                        if (candidates[i, j, cand] == 0) counter++;
+                    }
 
-                for (int num = 1; num < 10; num++)
-                {
-                    int idx = chain.IndexOf(num.ToString());
-                    if (idx != -1 && chain.IndexOf(num.ToString(), idx + 1) == -1)
+                    if (counter == 1)
                     {
                         for (int j = 1; j < 10; j++)
                         {
-                            if (str[i, j].Contains(num.ToString()))
+                            if (candidates[i, j, cand] == 0)
                             {
-                                Fill(i, j, num);
+                                Fill(i, j, cand);
+                                methodNo[1]++;
                             }
                         }
                     }
@@ -89,23 +86,22 @@ namespace SudokuSolver
             //CHECK COLS
             for (int j = 1; j < 10; j++)
             {
-                string chain = "";
-
-                for (int i = 1; i < 10; i++)
+                for (int cand = 1; cand < 10; cand++)
                 {
-                    chain = chain + str[i, j];
-                }
+                    byte counter = 0;
+                    for (int i = 1; i < 10; i++)
+                    {
+                        if (candidates[i, j, cand] == 0) counter++;
+                    }
 
-                for (int num = 1; num < 10; num++)
-                {
-                    int idx = chain.IndexOf(num.ToString());
-                    if (idx != -1 && chain.IndexOf(num.ToString(), idx + 1) == -1)
+                    if (counter == 1)
                     {
                         for (int i = 1; i < 10; i++)
                         {
-                            if (str[i, j].Contains(num.ToString()))
+                            if (candidates[i, j, cand] == 0)
                             {
-                                Fill(i, j, num);
+                                Fill(i, j, cand);
+                                methodNo[1]++;
                             }
                         }
                     }
@@ -118,6 +114,7 @@ namespace SudokuSolver
         ///</summary>
         void PointingPair()
         {
+            lastMethod = 2;
             for (int q = 1; q < 10; q++)
             {
                 for (int n = 1; n < 10; n++)
@@ -125,7 +122,7 @@ namespace SudokuSolver
                     int i = 0, j = 0;
                     for (int box = 1; box < 10; box++)
                     {
-                        if (str[block[q, box, 0], block[q, box, 1]].Contains(n.ToString()))
+                        if (candidates[block[q, box, 0], block[q, box, 1], n] == 0)
                         {
                             if (i == 0)
                             {
@@ -143,10 +140,10 @@ namespace SudokuSolver
                     {
                         for (int x = 1; x < 10; x++)
                         {
-                            if (GetBlock(i, x) != q && str[i, x].Contains(n.ToString()))
+                            if (GetBlock(i, x) != q && candidates[i, x, n] == 0)
                             {
                                 methodNo[2]++;
-                                StrRemove(i, x, n);
+                                RemoveCandidate(i, x, n);
                             }
                         }
                     }
@@ -154,10 +151,10 @@ namespace SudokuSolver
                     {
                         for (int x = 1; x < 10; x++)
                         {
-                            if (GetBlock(x, j) != q && str[x, j].Contains(n.ToString()))
+                            if (GetBlock(x, j) != q && candidates[x, j, n] == 0)
                             {
                                 methodNo[2]++;
-                                StrRemove(x, j, n);
+                                RemoveCandidate(x, j, n);
                             }
                         }
                     }
@@ -170,6 +167,7 @@ namespace SudokuSolver
         ///</summary>
         void CorrectBlocksViaRowsCols()
         {
+            lastMethod = 3;
             int q, counter;
             bool sameQuad;
 
@@ -182,7 +180,7 @@ namespace SudokuSolver
                     sameQuad = true;
                     for (int j = 1; j < 10; j++)
                     {
-                        if (str[i, j].Contains(num.ToString()))
+                        if (candidates[i, j, num] == 0)
                         {
                             counter++;
                             if (q == 0)
@@ -203,10 +201,10 @@ namespace SudokuSolver
                     {
                         for (short n = 1; n < 10; n++)
                         {
-                            if (block[q, n, 0] != i && str[block[q, n, 0], block[q, n, 1]].Contains(num.ToString()))
+                            if (block[q, n, 0] != i && candidates[block[q, n, 0], block[q, n, 1], num] == 0)
                             {
                                 methodNo[3]++;
-                                StrRemove(block[q, n, 0], block[q, n, 1], num);
+                                RemoveCandidate(block[q, n, 0], block[q, n, 1], num);
                             }
                         }
                     }
@@ -219,7 +217,7 @@ namespace SudokuSolver
                     sameQuad = true;
                     for (int i = 1; i < 10; i++)
                     {
-                        if (str[i, j].Contains(num.ToString()))
+                        if (candidates[i, j, num] == 0)
                         {
                             counter++;
                             if (i == 1)
@@ -240,10 +238,10 @@ namespace SudokuSolver
                     {
                         for (short n = 1; n < 10; n++)
                         {
-                            if (block[q, n, 1] != j && str[block[q, n, 0], block[q, n, 1]].Contains(num.ToString()))
+                            if (block[q, n, 1] != j && candidates[block[q, n, 0], block[q, n, 1], num] == 0)
                             {
                                 methodNo[3]++;
-                                StrRemove(block[q, n, 0], block[q, n, 1], num);
+                                RemoveCandidate(block[q, n, 0], block[q, n, 1], num);
                             }
                         }
                     }
@@ -256,13 +254,14 @@ namespace SudokuSolver
         ///</summary>
         void NakedPair()
         {
+            lastMethod = 4;
             int[,] ctnr = new int[81, 2];
             int counter = 0;
             for (int i = 1; i < 10; i++)
             {
                 for (int j = 1; j < 10; j++)
                 {
-                    if (str[i, j].Length == 2)
+                    if (candidates[i, j, 0] == 2)
                     {
                         ctnr[counter, 0] = i;
                         ctnr[counter, 1] = j;
@@ -270,68 +269,69 @@ namespace SudokuSolver
                     }
                 }
             }
-            for (int a = 0; a < counter; a++)
+            for (int c1 = 0; c1 < counter; c1++)
             {
-                for (int b = 0; b < counter; b++)
+                for (int c2 = 0; c2 < counter; c2++)
                 {
-                    if (str[ctnr[a, 0], ctnr[a, 1]] == str[ctnr[b, 0], ctnr[b, 1]] && !(ctnr[a, 0] == ctnr[b, 0] && ctnr[a, 1] == ctnr[b, 1]) && str[ctnr[a, 0], ctnr[a, 1]].Length > 1)
+                    if ((ctnr[c1, 0] != ctnr[c2, 0] || ctnr[c1, 1] != ctnr[c2, 1]) && candidates.AreEqual(ctnr[c1, 0], ctnr[c1, 1], ctnr[c2, 0], ctnr[c2, 1]) && candidates[ctnr[c1, 0], ctnr[c1, 1], 0] > 1)
                     {
-                        if (ctnr[a, 0] == ctnr[b, 0])
+                        int[] both = candidates.ToArray(ctnr[c1, 0], ctnr[c1, 1]);
+                        if (ctnr[c1, 0] == ctnr[c2, 0])
                         {
                             for (int j = 1; j < 10; j++)
                             {
-                                if (j != ctnr[a, 1] && j != ctnr[b, 1])
+                                if (j != ctnr[c1, 1] && j != ctnr[c2, 1])
                                 {
-                                    if (str[ctnr[a, 0], j].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
+                                    if (candidates[ctnr[c1, 0], j, both[0]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        RemoveCandidate(ctnr[c1, 0], j, both[0]);
                                     }
-                                    if (str[ctnr[a, 0], j].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
+                                    if (candidates[ctnr[c1, 0], j, both[1]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(ctnr[a, 0], j, str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        RemoveCandidate(ctnr[c1, 0], j, both[1]);
                                     }
                                 }
                             }
                         }
-                        if (ctnr[a, 1] == ctnr[b, 1])
+                        else if (ctnr[c1, 1] == ctnr[c2, 1])
                         {
                             for (int i = 1; i < 10; i++)
                             {
-                                if (i != ctnr[a, 0] && i != ctnr[b, 0])
+                                if (i != ctnr[c1, 0] && i != ctnr[c2, 0])
                                 {
-                                    if (str[i, ctnr[a, 1]].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
+                                    if (candidates[i, ctnr[c1, 1], both[0]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        RemoveCandidate(i, ctnr[c1, 1], both[0]);
                                     }
-                                    if (str[i, ctnr[a, 1]].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
+                                    if (candidates[i, ctnr[c1, 1], both[1]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(i, ctnr[a, 1], str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        RemoveCandidate(i, ctnr[c1, 1], both[1]);
                                     }
                                 }
                             }
                         }
-                        if (GetBlock(ctnr[a, 0], ctnr[a, 1]) == GetBlock(ctnr[b, 0], ctnr[b, 1]))
+                        if (GetBlock(ctnr[c1, 0], ctnr[c1, 1]) == GetBlock(ctnr[c2, 0], ctnr[c2, 1]))
                         {
-                            int q = GetBlock(ctnr[a, 0], ctnr[a, 1]);
+                            int q = GetBlock(ctnr[c1, 0], ctnr[c1, 1]);
                             for (int n = 1; n < 10; n++)
                             {
                                 int i = block[q, n, 0];
                                 int j = block[q, n, 1];
-                                if (!(i == ctnr[a, 0] && j == ctnr[a, 1]) && !(i == ctnr[b, 0] && j == ctnr[b, 1]))
+                                if ((i != ctnr[c1, 0] || j != ctnr[c1, 1]) && (i != ctnr[c2, 0] || j != ctnr[c2, 1]))
                                 {
-                                    if (str[i, j].Contains(str[ctnr[a, 0], ctnr[a, 1]][0]))
+                                    if (candidates[i, j, both[0]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][0]);
+                                        RemoveCandidate(i, j, both[0]);
                                     }
-                                    if (str[i, j].Contains(str[ctnr[a, 0], ctnr[a, 1]][1]))
+                                    if (candidates[i, j, both[1]] == 0)
                                     {
                                         methodNo[4]++;
-                                        StrRemove(i, j, str[ctnr[a, 0], ctnr[a, 1]][1]);
+                                        RemoveCandidate(i, j, both[1]);
                                     }
                                 }
                             }
@@ -346,189 +346,191 @@ namespace SudokuSolver
         ///If found, leaves these candidates as their only candidates.
         ///"change" variable must be handled, snice "strRemove" method is not used!
         ///</summary>
-        void HiddenPair()
-        {
-            //ROWS
-            for (int i = 1; i < 10; i++)
-            {
-                string concat = "";
-                for (int j = 1; j < 10; j++) concat += str[i, j];
-                for (int a = 1; a < 10; a++)
-                {
-                    short count = 0;
-                    foreach (char c in concat)
-                    {
-                        if (int.Parse(c.ToString()) == a) count++;
-                    }
-                    if (count == 2)
-                    {
-                        for (int b = a + 1; b < 10; b++)
-                        {
-                            count = 0;
-                            foreach (char c in concat)
-                            {
-                                if (int.Parse(c.ToString()) == b) count++;
-                            }
-                            if (count == 2)
-                            {
-                                count = 0;
-                                int j1 = 0;
-                                for (int j = 1; j < 10; j++)
-                                {
-                                    if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
-                                    {
-                                        count++;
-                                        if (count == 1) j1 = j;
-                                        if (count == 2)
-                                        {
-                                            if (str[i, j1].Length > 2 || str[i, j].Length > 2)
-                                            {
-                                                str[i, j1] = str[i, j] = String.Concat(a, b);
-                                                change = true;
-                                                ///OLD BODY
-                                                ///for (int num = 1; num < 10; num++)
-                                                ///{
-                                                ///    if (num != a && num != b)
-                                                ///    {
-                                                ///        if (str[i, j1].Contains(num.ToString()))
-                                                ///        {
-                                                ///            StrRemove(i, j1, num);
-                                                ///            methodNo[5]++;
-                                                ///        }
-                                                ///        if (str[i, j].Contains(num.ToString()))
-                                                ///        {
-                                                ///            StrRemove(i, j, num);
-                                                ///            methodNo[5]++;
-                                                ///        }
-                                                ///    }
-                                                ///}
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        //void HiddenPair()
+        //{
+        //    lastMethod = 5;
+        //    //ROWS
+        //    for (int i = 1; i < 10; i++)
+        //    {
+        //        string concat = "";
+        //        for (int j = 1; j < 10; j++) concat += str[i, j];
+        //        for (int a = 1; a < 10; a++)
+        //        {
+        //            short count = 0;
+        //            foreach (char c in concat)
+        //            {
+        //                if (int.Parse(c.ToString()) == a) count++;
+        //            }
+        //            if (count == 2)
+        //            {
+        //                for (int b = a + 1; b < 10; b++)
+        //                {
+        //                    count = 0;
+        //                    foreach (char c in concat)
+        //                    {
+        //                        if (int.Parse(c.ToString()) == b) count++;
+        //                    }
+        //                    if (count == 2)
+        //                    {
+        //                        count = 0;
+        //                        int j1 = 0;
+        //                        for (int j = 1; j < 10; j++)
+        //                        {
+        //                            if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
+        //                            {
+        //                                count++;
+        //                                if (count == 1) j1 = j;
+        //                                if (count == 2)
+        //                                {
+        //                                    if (str[i, j1].Length > 2 || str[i, j].Length > 2)
+        //                                    {
+        //                                        str[i, j1] = str[i, j] = String.Concat(a, b);
+        //                                        change = true;
+        //                                        ///OLD BODY
+        //                                        ///for (int num = 1; num < 10; num++)
+        //                                        ///{
+        //                                        ///    if (num != a && num != b)
+        //                                        ///    {
+        //                                        ///        if (str[i, j1].Contains(num.ToString()))
+        //                                        ///        {
+        //                                        ///            StrRemove(i, j1, num);
+        //                                        ///            methodNo[5]++;
+        //                                        ///        }
+        //                                        ///        if (str[i, j].Contains(num.ToString()))
+        //                                        ///        {
+        //                                        ///            StrRemove(i, j, num);
+        //                                        ///            methodNo[5]++;
+        //                                        ///        }
+        //                                        ///    }
+        //                                        ///}
+        //                                    }
+        //                                    break;
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            //COLS
-            for (int j = 1; j < 10; j++)
-            {
-                string concat = "";
-                for (int i = 1; i < 10; i++) concat += str[i, j];
-                for (int a = 1; a < 10; a++)
-                {
-                    short count = 0;
-                    foreach (char c in concat)
-                    {
-                        if (int.Parse(c.ToString()) == a) count++;
-                    }
-                    if (count == 2)
-                    {
-                        for (int b = a + 1; b < 10; b++)
-                        {
-                            count = 0;
-                            foreach (char c in concat)
-                            {
-                                if (int.Parse(c.ToString()) == b) count++;
-                            }
-                            if (count == 2)
-                            {
-                                count = 0;
-                                int i1 = 0;
-                                for (int i = 1; i < 10; i++)
-                                {
-                                    if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
-                                    {
-                                        count++;
-                                        if (count == 1) i1 = i;
-                                        if (count == 2)
-                                        {
-                                            if (str[i1, j].Length > 2 || str[i, j].Length > 2)
-                                            {
-                                                str[i1, j] = str[i, j] = String.Concat(a, b);
-                                                change = true;
-                                                methodNo[5]++;
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        //    //COLS
+        //    for (int j = 1; j < 10; j++)
+        //    {
+        //        string concat = "";
+        //        for (int i = 1; i < 10; i++) concat += str[i, j];
+        //        for (int a = 1; a < 10; a++)
+        //        {
+        //            short count = 0;
+        //            foreach (char c in concat)
+        //            {
+        //                if (int.Parse(c.ToString()) == a) count++;
+        //            }
+        //            if (count == 2)
+        //            {
+        //                for (int b = a + 1; b < 10; b++)
+        //                {
+        //                    count = 0;
+        //                    foreach (char c in concat)
+        //                    {
+        //                        if (int.Parse(c.ToString()) == b) count++;
+        //                    }
+        //                    if (count == 2)
+        //                    {
+        //                        count = 0;
+        //                        int i1 = 0;
+        //                        for (int i = 1; i < 10; i++)
+        //                        {
+        //                            if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
+        //                            {
+        //                                count++;
+        //                                if (count == 1) i1 = i;
+        //                                if (count == 2)
+        //                                {
+        //                                    if (str[i1, j].Length > 2 || str[i, j].Length > 2)
+        //                                    {
+        //                                        str[i1, j] = str[i, j] = String.Concat(a, b);
+        //                                        change = true;
+        //                                        methodNo[5]++;
+        //                                    }
+        //                                    break;
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            //BLOCKS
-            for (int block = 1; block < 10; block++)
-            {
-                string concat = "";
-                //inlined or not is better for speed?
-                for (int n = 1; n < 10; n++)
-                {
-                    GetIndexes(block, n, out int i, out int j);
-                    concat += str[i, j];
-                }
-                for (int a = 1; a < 10; a++)
-                {
-                    short count = 0;
-                    foreach (char c in concat)
-                    {
-                        if (c.ToString() == a.ToString()) count++;
-                    }
-                    if (count == 2)
-                    {
-                        for(int b = a + 1; b < 10; b++)
-                        {
-                            count = 0;
-                            foreach(char c in concat)
-                            {
-                                if (c.ToString() == b.ToString()) count++;
-                            }
+        //    //BLOCKS
+        //    for (int block = 1; block < 10; block++)
+        //    {
+        //        string concat = "";
+        //        //inlined or not is better for speed?
+        //        for (int n = 1; n < 10; n++)
+        //        {
+        //            GetIndexes(block, n, out int i, out int j);
+        //            concat += str[i, j];
+        //        }
+        //        for (int a = 1; a < 10; a++)
+        //        {
+        //            short count = 0;
+        //            foreach (char c in concat)
+        //            {
+        //                if (c.ToString() == a.ToString()) count++;
+        //            }
+        //            if (count == 2)
+        //            {
+        //                for(int b = a + 1; b < 10; b++)
+        //                {
+        //                    count = 0;
+        //                    foreach(char c in concat)
+        //                    {
+        //                        if (c.ToString() == b.ToString()) count++;
+        //                    }
                             
-                            if (count == 2)
-                            {
-                                count = 0;
-                                int i, j, i1, j1;
-                                i = j = i1 = j1 = 0;
-                                for (int n = 1; n < 10; n++)
-                                {
-                                    GetIndexes(block, n, out i, out j);
-                                    if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
-                                    {
-                                        count++;
-                                        if (count == 1)
-                                        {
-                                            i1 = i;
-                                            j1 = j;
-                                        }
-                                        if (count == 2)
-                                        {
-                                            if (str[i1, j1].Length > 2 || str[i, j].Length > 2)
-                                            {
-                                                str[i1, j1] = str[i, j] = String.Concat(a, b);
-                                                change = true;
-                                                methodNo[5]++;
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                    if (count == 2)
+        //                    {
+        //                        count = 0;
+        //                        int i, j, i1, j1;
+        //                        i = j = i1 = j1 = 0;
+        //                        for (int n = 1; n < 10; n++)
+        //                        {
+        //                            GetIndexes(block, n, out i, out j);
+        //                            if (str[i, j].Contains(a.ToString()) && str[i, j].Contains(b.ToString()))
+        //                            {
+        //                                count++;
+        //                                if (count == 1)
+        //                                {
+        //                                    i1 = i;
+        //                                    j1 = j;
+        //                                }
+        //                                if (count == 2)
+        //                                {
+        //                                    if (str[i1, j1].Length > 2 || str[i, j].Length > 2)
+        //                                    {
+        //                                        str[i1, j1] = str[i, j] = String.Concat(a, b);
+        //                                        change = true;
+        //                                        methodNo[5]++;
+        //                                    }
+        //                                    break;
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         ///<summary>
         ///#6 (partial)
         ///</summary>
         void FindHook()
         {
+            lastMethod = 6;
             // #5
             int[,] ctnr = new int[81, 2];
             int counter = 0;
@@ -536,7 +538,7 @@ namespace SudokuSolver
             {
                 for (int j = 1; j < 10; j++)
                 {
-                    if (str[i, j].Length == 2)
+                    if (candidates[i, j, 0] == 2)
                     {
                         ctnr[counter, 0] = i;
                         ctnr[counter, 1] = j;
@@ -545,23 +547,24 @@ namespace SudokuSolver
                 }
             }
 
-            for (int a = 0; a < counter + 1; a++)
+            for (int c1 = 0; c1 < counter + 1; c1++)
             {
-                for (int b = 0; b < counter + 1; b++)
+                for (int c2 = 0; c2 < counter + 1; c2++)
                 {
-                    if (GetBlock(ctnr[a, 0], ctnr[a, 1]) != GetBlock(ctnr[b, 0], ctnr[b, 1]))
+                    if (GetBlock(ctnr[c1, 0], ctnr[c1, 1]) != GetBlock(ctnr[c2, 0], ctnr[c2, 1]))
                     {
-                        if (ctnr[a, 0] == ctnr[b, 0] || ctnr[a, 1] == ctnr[b, 1])
+                        if (ctnr[c1, 0] == ctnr[c2, 0] || ctnr[c1, 1] == ctnr[c2, 1])
                         {
-                            if (str[ctnr[a, 0], ctnr[a, 1]] != str[ctnr[b, 0], ctnr[b, 1]] && str[ctnr[a, 0], ctnr[a, 1]].Length == 2 && str[ctnr[b, 0], ctnr[b, 1]].Length == 2)
+                            if (!candidates.AreEqual(ctnr[c1, 0], ctnr[c1, 1], ctnr[c2, 0], ctnr[c2, 1]) && candidates[ctnr[c1, 0], ctnr[c1, 1], 0] == 2 && candidates[ctnr[c2, 0], ctnr[c2, 1], 0] == 2)
                             {
-                                if (str[ctnr[a, 0], ctnr[a, 1]].Contains(str[ctnr[b, 0], ctnr[b, 1]][0]))
+                                int[] c2Candidates = candidates.ToArray(ctnr[c2, 0], ctnr[c2, 1]);
+                                if (candidates[ctnr[c1, 0], ctnr[c1, 1], c2Candidates[0]] == 0)
                                 {
-                                    FindHookPoint(ctnr[a, 0], ctnr[a, 1], ctnr[b, 0], ctnr[b, 1], str[ctnr[b, 0], ctnr[b, 1]][0], ref ctnr, ref counter);
+                                    FindHookPoint(ctnr[c1, 0], ctnr[c1, 1], ctnr[c2, 0], ctnr[c2, 1], c2Candidates[0], ref ctnr, ref counter);
                                 }
-                                if (str[ctnr[a, 0], ctnr[a, 1]].Contains(str[ctnr[b, 0], ctnr[b, 1]][1]))
+                                if (candidates[ctnr[c1, 0], ctnr[c1, 1], c2Candidates[1]] == 0)
                                 {
-                                    FindHookPoint(ctnr[a, 0], ctnr[a, 1], ctnr[b, 0], ctnr[b, 1], str[ctnr[b, 0], ctnr[b, 1]][0], ref ctnr, ref counter);
+                                    FindHookPoint(ctnr[c1, 0], ctnr[c1, 1], ctnr[c2, 0], ctnr[c2, 1], c2Candidates[1], ref ctnr, ref counter);
                                 }
                             }
                         }
@@ -573,37 +576,40 @@ namespace SudokuSolver
         ///<summary>
         ///#6 (REMOVES) (partial)
         ///</summary>
-        void FindHookPoint(int i1, int j1, int i2, int j2, char val1, ref int[,] ctnr, ref int counter)
+        void FindHookPoint(int i1, int j1, int i2, int j2, int val1, ref int[,] ctnr, ref int counter)
         {
-            // findHook() extention
-            char val2 = 'a', eliminator = 'a';
-            switch (str[i2, j2].IndexOf(val1))
+            lastMethod = 7;
+            int[] c1Cds = candidates.ToArray(i1, j1);
+            int[] c2Cds = candidates.ToArray(i2, j2);
+            int val2 = -1, eliminator = -1;
+
+            switch (Array.IndexOf(c2Cds, val1))
             {
-                case 0: val2 = str[i2, j2][1]; break;
-                case 1: val2 = str[i2, j2][0]; break;
+                case 0: val2 = c2Cds[1]; break;
+                case 1: val2 = c2Cds[0]; break;
             }
-            switch (str[i1, j1].IndexOf(val1))
+            switch (Array.IndexOf(c1Cds, val1))
             {
-                case 0: eliminator = str[i1, j1][1]; break;
-                case 1: eliminator = str[i1, j1][0]; break;
+                case 0: eliminator = c1Cds[1]; break;
+                case 1: eliminator = c1Cds[0]; break;
             }
 
             for (int x = 0; x < counter; x++)
             {
                 if ((GetBlock(i2, j2) == GetBlock(ctnr[x, 0], ctnr[x, 1])) && ctnr[x, 0] != i1 && ctnr[x, 1] != j1)
                 {
-                    if (str[ctnr[x, 0], ctnr[x, 1]].Contains(val2) && str[ctnr[x, 0], ctnr[x, 1]].Contains(eliminator))
+                    if (candidates[ctnr[x, 0], ctnr[x, 1], val2] == 0 && candidates[ctnr[x, 0], ctnr[x, 1], eliminator] == 0)
                     {
                         //getTb(ctnr[x, 0], ctnr[x, 1]).BackColor = Color.Thistle;
                         if (i1 == i2)
                         {
                             for (int j = 1; j < 10; j++)
                             {
-                                if (str[ctnr[x, 0], j].Contains(eliminator) && GetBlock(ctnr[x, 0], j) == GetBlock(i1, j1))
+                                if (candidates[ctnr[x, 0], j, eliminator] == 0 && GetBlock(ctnr[x, 0], j) == GetBlock(i1, j1))
                                 {
                                     //getTb(ctnr[x, 0], j).BackColor = Color.Black;
                                     methodNo[6]++;
-                                    StrRemove(ctnr[x, 0], j, eliminator);
+                                    RemoveCandidate(ctnr[x, 0], j, eliminator);
                                 }
                             }
                         }
@@ -611,11 +617,11 @@ namespace SudokuSolver
                         {
                             for (int i = 1; i < 10; i++)
                             {
-                                if (str[i, ctnr[x, 1]].Contains(eliminator) && GetBlock(i, ctnr[x, 1]) == GetBlock(i1, j1))
+                                if (candidates[i, ctnr[x, 1], eliminator] == 0 && GetBlock(i, ctnr[x, 1]) == GetBlock(i1, j1))
                                 {
                                     //getTb(i, ctnr[x, 1]).BackColor = Color.Black;
                                     methodNo[6]++;
-                                    StrRemove(i, ctnr[x, 1], eliminator);
+                                    RemoveCandidate(i, ctnr[x, 1], eliminator);
                                 }
                             }
                         }
@@ -637,13 +643,13 @@ namespace SudokuSolver
             depth++;
             int i = 0;
             int j = 0;
-            string[,] oldStr = new string[10, 10];
+            sbyte[,,] oldCandidates = new sbyte[10, 10, 10];
             int[,] oldArr = new int[10, 10];
             for (int k = 1; k < 10; k++)
             {
                 for (int l = 1; l < 10 && i == 0; l++)
                 {
-                    if (str[k, l].Length == 2)
+                    if (candidates[k, l, 0] == 2)
                     {
                         i = k;
                         j = l;
@@ -653,36 +659,37 @@ namespace SudokuSolver
 
             if (i != 0)
             {
+                int[] last2 = candidates.ToArray(i, j);
                 int filledOld = filled;
                 Array.Copy(arr, oldArr, arr.Length);
-                Array.Copy(str, oldStr, str.Length);
-                dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + str[i, j][0] + ") ";
-                Fill(i, j, int.Parse(str[i, j][0].ToString()));
+                Array.Copy(candidates, oldCandidates, candidates.Length);
+                dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + last2[0].ToString() + ") ";
+                Fill(i, j, last2[0]);
 
                 bool proceed = TryToSolve();
 
                 if (filled < 81 || proceed)
                 {
-                    Restore(oldArr, oldStr, filledOld);
-                    dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + str[i, j][1] + ") ";
-                    Fill(i, j, int.Parse(str[i, j][1].ToString()));
+                    Restore(oldArr, oldCandidates, filledOld);
+                    dp = dp + "\n(" + i.ToString() + j.ToString() + " - " + last2[1].ToString() + ") ";
+                    Fill(i, j, last2[1]);
                     proceed = TryToSolve();
                 }
 
                 if (filled < 81 || proceed)
                 {
-                    Restore(oldArr, oldStr, filledOld);
+                    Restore(oldArr, oldCandidates, filledOld);
                 }
             }
             depth--;
         }
 
-        void Restore(int[,] oldArr, string[,] oldStr, int filledOld)
+        void Restore(int[,] oldArr, sbyte[,,] oldCandidates, int filledOld)
         {
             filled = filledOld;
             error = false;
             Array.Copy(oldArr, arr, arr.Length);
-            Array.Copy(oldStr, str, str.Length);
+            Array.Copy(oldCandidates, candidates, candidates.Length);
         }
     }
 }

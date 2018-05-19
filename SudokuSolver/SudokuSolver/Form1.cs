@@ -8,11 +8,12 @@ namespace SudokuSolver
     public partial class Form1 : Form
     {
         int[] methodNo = { 0, 0, 0, 0, 0, 0, 0 };
+        public static byte lastMethod = 0;
         int filled, depth, solutionsCounter;
         //[i, j]
         int[,] arr = new int[10, 10];
-        //[i, j]
-        string[,] str = new string[10, 10];
+        //[i, j, num]
+        sbyte[,,] candidates = new sbyte[10, 10, 10];
         //[block_No, box_No, i_j_indexes]
         int[,,] block = new int[10, 10, 2];
         bool change, error, counting;
@@ -30,17 +31,16 @@ namespace SudokuSolver
 
         bool TryToSolve()
         {
-            dp = dp + depth.ToString()+" ";
+            dp = dp + depth.ToString() + " ";
             do
             {
                 change = false;
-                SoleCandidate();
                 UniqueCandidate();
                 PointingPair();
                 NakedPair();
                 CorrectBlocksViaRowsCols();
                 FindHook();
-                HiddenPair();
+                //HiddenPair();
             } while (change && filled != 81);
 
             if (filled == 81)
@@ -58,7 +58,7 @@ namespace SudokuSolver
                 var whatNext = whatNextWindow.ShowDialog();
                 if (whatNext == DialogResult.Yes)
                 {
-                    if(depth == 0)
+                    if (depth == 0)
                     {
                         label1.Text = "This puzzle has a single solution!";
                         return true;
@@ -99,7 +99,7 @@ namespace SudokuSolver
                 dp = dp + "e ";
             }
 
-            if(depth == 0)
+            if (depth == 0)
             {
                 if (counting)
                 {
@@ -139,12 +139,17 @@ namespace SudokuSolver
                 }
             }
         }
-        
+
         //Fills a value in arr[i,j]
         void Fill(int i, int j, int num)
         {
-            arr[i,j] = num;
-            str[i, j] = "";
+            lastMethod = 0;
+            arr[i, j] = num;
+            for (int n = 1; n < 10; n++)
+            {
+                candidates[i, j, n] = 1;
+            }
+            candidates[i, j, 0] = -1;
             filled++;
             CorrectNeighbors(i, j, arr[i, j]);
             change = true;
@@ -162,39 +167,34 @@ namespace SudokuSolver
             }
             else
             {
-                if(arr[i, j] < 1) Fill(i, j, num);
+                if (arr[i, j] < 1) Fill(i, j, num);
                 tb.Enabled = false;
                 tb.BackColor = Color.LightBlue;
             }
-            load.Text = "Filled: "+filled.ToString();
+            load.Text = "Filled: " + filled.ToString();
         }
 
         //(REMOVES) Executes for every resolved cell
-        void CorrectNeighbors(int x, int y, int num)
+        void CorrectNeighbors(int i, int j, int num)
         {
+            lastMethod = 8;
             //ROWS COLS
-            for (int i = 1; i < 10; i++)
+            for (int k = 1; k < 10; k++)
             {
-                if (i != y && str[x, i].Contains(num.ToString()))
-                {
-                    StrRemove(x,i,num);
-                }
-                if (i != x && str[i, y].Contains(num.ToString()))
-                {
-                    StrRemove(i,y,num);
-                }
+                if (k != j) RemoveCandidate(i, k, num);
+                if (k != i) RemoveCandidate(k, j, num);
             }
 
             //QUADS
-            for (int i = x - 2; i < x + 3; i++)
+            for (int x = i - 2; x < i + 3; x++)
             {
-                if (i > 0 && i < 10)
+                if (x > 0 && x < 10)
                 {
-                    for (int j = y - 2; j < y + 3; j++)
+                    for (int y = j - 2; y < j + 3; y++)
                     {
-                        if (j > 0 && j < 10 && GetBlock(i, j) == GetBlock(x, y) && str[i, j].Contains(num.ToString()))
+                        if (y > 0 && y < 10 && GetBlock(i, j) == GetBlock(x, y) && (x != i || y != j))
                         {
-                            StrRemove(i, j, num);
+                            RemoveCandidate(x, y, num);
                         }
                     }
                 }
@@ -204,14 +204,11 @@ namespace SudokuSolver
         //Fills the initial values of some variables
         void Populate()
         {
-            //str[,]
+
+            //Candidates counter for every cell
             for (int i = 1; i < 10; i++)
-            {
                 for (int j = 1; j < 10; j++)
-                {
-                    str[i, j] = "123456789";
-                }
-            }
+                    candidates[i, j, 0] = 9;
 
             //block[,,]
             for (int i = 1; i < 10; i++)
@@ -240,9 +237,9 @@ namespace SudokuSolver
         //Gets the number of the block that holds the cell with the given indexes
         int GetBlock(int i, int j)
         {
-            int b = (int) Math.Ceiling(((double)j) / 3);
-            int a = (int) (Math.Ceiling(((double)i) / 3))-1;
-            return (a*3 + b);
+            int b = (int)Math.Ceiling(((double)j) / 3);
+            int a = (int)(Math.Ceiling(((double)i) / 3)) - 1;
+            return (a * 3 + b);
         }
 
         //Gets the indexes of a cell, given its block number (1-9) and its number in the block (1-9)
@@ -272,7 +269,7 @@ namespace SudokuSolver
         //Gets a TextBox object given its indexes
         TextBox GetTextBox(int i, int j)
         {
-            int num = i*9 - (9 - j);
+            int num = i * 9 - (9 - j);
             TextBox tb = (TextBox)Controls.Find("textBox" + num.ToString(), true)[0];
             return tb;
         }
@@ -284,37 +281,19 @@ namespace SudokuSolver
             return tb;
         }
 
-        void StrRemove(int i, int j, int num)
+        void RemoveCandidate(int i, int j, int num)
         {
-            str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num.ToString()), 1);
-            change = true;
-            if (str[i, j].Length < 1)
+            lastMethod = 9;
+            if (candidates[i,j,num] == 0)
             {
-                error = true;
-                //GetTextBox(i, j).BackColor = Color.Red;
+                candidates[i, j, num] = 1;
+                candidates[i, j, 0]--;
+                change = true;
             }
-        }
 
-        void StrRemove(int i, int j, char num)
-        {
-            str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num), 1);
-            change = true;
-            if (str[i, j].Length < 1)
-            {
-                error = true;
-                //GetTextBox(i, j).BackColor = Color.Red;
-            }
-        }
+            if (candidates[i, j, 0] == 0) error = true;
 
-        void StrRemove(int i, int j, string num)
-        {
-            str[i, j] = str[i, j].Remove(str[i, j].IndexOf(num), 1);
-            change = true;
-            if (str[i, j].Length < 1)
-            {
-                error = true;
-                //GetTextBox(i, j).BackColor = Color.Red;
-            }
+            //if (candidates[i, j, 0] == 1) Fill(i, j, candidates.Last(i, j));
         }
 
         void solve_Click(object sender, EventArgs e)
@@ -371,7 +350,7 @@ namespace SudokuSolver
         {
             TextBox tb = (TextBox)sender;
             GetTextBoxIndexes(tb, out int i, out int j);
-            label1.Text = str[i, j].ToString();
+            label1.Text = candidates.ToString(i, j) + "   = " + candidates[i,j,0].ToString();
         }
         
         void newWin_Click(object sender, EventArgs e)
