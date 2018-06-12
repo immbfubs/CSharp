@@ -1,0 +1,80 @@
+﻿<Window x:Class="TotalAmount.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TotalAmount"
+        mc:Ignorable="d"
+        Title="Други настройки" Height="427" Width="350" Name="wind">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Properties/StyleButtons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <StackPanel Orientation="Vertical" Margin="5,5,5,5">
+        <Border Background="Transparent" BorderBrush="CadetBlue" BorderThickness="1" Padding="5,0,0,10" Margin="0,0,0,5">
+            <StackPanel>
+                <Label Content="Начални дати на сезоните" HorizontalContentAlignment="Center" Margin="0,0,0,10" Foreground="CadetBlue"/>
+                <Grid HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Name="label1"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Height="20" Width="30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Name="tBox1"/>
+                    <ComboBox Grid.Row="0" Grid.Column="2" Height="25" Width="140" VerticalContentAlignment="Center" ItemsSource="{Binding months}" Name="cBox1"/>
+                    <Label Grid.Row="1" Grid.Column="0" Name="label2"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Name="tBox2"/>
+                    <ComboBox Grid.Row="1" Grid.Column="2" Height="25" Width="140" HorizontalAlignment="Right" VerticalContentAlignment="Center" Name="cBox2"/>
+                    <Label Grid.Row="2" Grid.Column="0" Name="label3"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Name="tBox3"/>
+                    <ComboBox Grid.Row="2" Grid.Column="2" Height="25" Width="140" HorizontalAlignment="Right" VerticalContentAlignment="Center" Name="cBox3"/>
+                    <Label Grid.Row="3" Grid.Column="0" Name="label4"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Name="tBox4"/>
+                    <ComboBox Grid.Row="3" Grid.Column="2" Height="25" Width="140" HorizontalAlignment="Right" VerticalContentAlignment="Center" Name="cBox4"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Border Background="Transparent" BorderBrush="CadetBlue" BorderThickness="1" Padding="5,0,0,10" Margin="0,0,0,5">
+            <StackPanel>
+                <Label Content="Допълнителни легла" HorizontalContentAlignment="Center" Margin="0,0,0,5" Foreground="CadetBlue"/>
+                <TextBlock Text="Цените на допълнителните легла като проценти от цената на редовно легло:" TextWrapping="Wrap" HorizontalAlignment="Left" Margin="5,0,10,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Под 12г"/>
+                    <TextBox Name="tBox5" Height="20" Width="25" VerticalContentAlignment="Center"/>
+                    <Label Content="%" Margin="0,0,30,0"/>
+                    <Label Content="Над 12г"/>
+                    <TextBox Name="tBox6" Height="20" Width="25" VerticalContentAlignment="Center"/>
+                    <Label Content="%"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border Background="Transparent" BorderBrush="CadetBlue" BorderThickness="1" Padding="0,0,0,10" Margin="0,0,0,10">
+            <StackPanel>
+                <Label Content="Selection color" HorizontalContentAlignment="Center" Margin="0,0,0,5" Foreground="CadetBlue"/>
+                <StackPanel Name="stackPanColors" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                    <Rectangle Width="25" Height="25" Margin="0,0,5,0" Stroke="DarkSlateGray"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Button Name="btnSave" Width="150" Background="#94b9f7" BorderBrush="#94b9f7" Click="btnSave_Click">З А П А З И</Button>
+    </StackPanel>
+</Window>

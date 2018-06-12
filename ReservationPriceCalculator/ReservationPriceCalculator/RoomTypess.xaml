@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TotalAmount"
         mc:Ignorable="d"
-        Title="RoomTypess" Height="400" Width="560">
+        Title="RoomTypess" Height="500" Width="560">
     <Window.Resources>
         <Style TargetType="ListBoxItem">
             <Style.Triggers>

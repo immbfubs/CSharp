@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TotalAmount"
         mc:Ignorable="d"
+        Name="mainWin"
         Title="Калкулатор на резервации"
         ResizeMode="NoResize"
         Height="400"
@@ -18,21 +19,14 @@
         </LinearGradientBrush>
     </Window.Background>
     <Window.Resources>
-        <!--Defining styles for TextBlock dynamic style change from the runtime (to hide zero content)-->
-        <Style x:Key="Out" TargetType="{x:Type TextBlock}"/>
-        <Style x:Key="Low" TargetType="{x:Type TextBlock}"/>
-        <Style x:Key="High" TargetType="{x:Type TextBlock}"/>
-        <Style x:Key="Item" TargetType="{x:Type TextBox}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="GreenYellow"/>
-                    <!--WPF the following is not working?-->
-                    <Setter Property="BorderBrush" Value="Red"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Properties/Style.xaml"/>
+                <ResourceDictionary Source="Properties/StyleButtons.xaml"/>
+                <ResourceDictionary Source="Properties/StyleCalendar.xaml"/>
+                <ResourceDictionary Source="Properties/StyleListBoxItem.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -43,29 +37,15 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Background="#E0FFFFFF" Foreground="#FF08338e">
-            <MenuItem Header="_File" Height="20">
-            </MenuItem>
             <MenuItem Header="_Настройки" Height="20">
                 <MenuItem Header="_Типове стаи" Height="20" Click="MenuClick_RoomTypes"/>
-                <MenuItem Header="Други настройки" Height="20" Click="MenuClick_Settings"/>
-                <MenuItem Header="_Рестартирай файла с настройките" Height="20" Click="MenuClick_ResetSettingsFile"/>
-            </MenuItem>
-            <MenuItem Header="_Помощ" Height="20">
-                <MenuItem Header="_Помощ" Height="20">
-                    <MenuItem Header="_Помощ" Height="20">
-                        <MenuItem Header="_Помощ" Height="20">
-                            <MenuItem Header="_Помощ" Height="20">
-                                <MenuItem Header="_Помощ" Height="20">
-                                </MenuItem>
-                            </MenuItem>
-                        </MenuItem>
-                    </MenuItem>
-                </MenuItem>
+                <MenuItem Header="Други _настройки" Height="20" Click="MenuClick_Settings"/>
+                <MenuItem Header="_Рестартиране на настройките" Height="20" Click="MenuClick_ResetSettingsFile"/>
             </MenuItem>
         </Menu>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,0,0,0">
-            <TextBlock Width="40" Text="Бр" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock Width="40" Text=" #" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Width="81" Text="ТИП СТАЯ" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Width="130" Text="НАСТАНЯВАНЕ" Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBlock Width="130" Text="НАПУСКАНЕ" Style="{StaticResource HeaderTextBlockStyle}"/>
@@ -79,33 +59,41 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2">
-            <ListBox Name ="lBox" Background="#AAFFFFFF" BorderThickness="0" ItemsSource="{Binding Reservation}" MaxHeight="215" VerticalAlignment="Top">
+            <ListBox
+                Name ="lBox"
+                Visibility="Hidden"
+                Background="#AAFFFFFF"
+                BorderThickness="0"
+                MaxHeight="260"
+                VerticalAlignment="Top"
+                AlternationCount="{Binding Path=Reservation.Count}"
+                ItemsSource="{Binding Reservation}" MouseEnter="ListBox_MouseEnter" MouseLeave="ListBox_MouseLeave" MouseMove="ListBox_MouseMove">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding Quantity}" Style="{DynamicResource Item}" Width="30" KeyDown="TextBox_KeyDown"/>
-                            <TextBlock Text="{Binding Name}" Width="80" Margin="10,0,0,0"/>
-                            <TextBlock Text="{Binding CheckInDate, StringFormat='{}{0:dd / MM}'}" Width="131"/>
-                            <TextBlock Text="{Binding CheckOutDate, StringFormat='{}{0:dd / MM}'}" Width="131"/>
-                            <StackPanel Width="90" Orientation="Horizontal">
-                                <TextBlock Style="{DynamicResource Out}" Text="{Binding Price[0]}" Width="Auto"/>
+                        <StackPanel Orientation="Horizontal" Background="Transparent" MouseEnter="StackPanel_MouseEnter">
+                            <TextBox Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplatedParent.(ItemsControl.AlternationIndex), Mode=OneWay}" Style="{DynamicResource Item}" Width="30"/>
+                            <TextBlock Text="{Binding Name}" Width="80" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CheckInDate, StringFormat='{}{0:dd / MM}'}" Width="131" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CheckOutDate, StringFormat='{}{0:dd / MM}'}" Width="131" VerticalAlignment="Center"/>
+                            <StackPanel Width="90" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Style="{DynamicResource Out}" Text="{Binding Price[0]}" Width="Auto" FontWeight="SemiBold"/>
                                 <TextBlock Style="{DynamicResource Out}" Text="{Binding Days[0], StringFormat={}({0})}" Width="Auto" Margin="7,0,0,0" Foreground="RoyalBlue"/>
                             </StackPanel>
-                            <StackPanel Width="90" Orientation="Horizontal">
-                                <TextBlock Style="{DynamicResource Low}" Text="{Binding Price[1]}" Width="Auto"/>
+                            <StackPanel Width="90" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Style="{DynamicResource Low}" Text="{Binding Price[1]}" Width="Auto" FontWeight="SemiBold"/>
                                 <TextBlock Style="{DynamicResource Low}" Text="{Binding Days[1], StringFormat={}({0})}" Width="Auto" Margin="7,0,0,0" Foreground="RoyalBlue"/>
                             </StackPanel>
-                            <StackPanel Width="90" Orientation="Horizontal">
-                                <TextBlock Style="{DynamicResource High}" Text="{Binding Price[2]}" Width="Auto"/>
+                            <StackPanel Width="90" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Style="{DynamicResource High}" Text="{Binding Price[2]}" Width="Auto" FontWeight="SemiBold"/>
                                 <TextBlock Style="{DynamicResource High}" Text="{Binding Days[2], StringFormat={}({0})}" Width="Auto" Margin="7,0,0,0" Foreground="RoyalBlue"/>
                             </StackPanel>
-                            <StackPanel Width="90" Orientation="Horizontal">
-                                <TextBlock Text="{Binding Price[3]}" Width="Auto"/>
+                            <StackPanel Width="90" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Price[3]}" Width="Auto" FontWeight="SemiBold"/>
                                 <TextBlock Text="{Binding Days[3], StringFormat={}({0})}" Width="Auto" Margin="7,0,0,0" Foreground="RoyalBlue"/>
                             </StackPanel>
-                            <TextBox Width="30" Margin="15,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsBig}" KeyDown="TextBox_KeyDown"/>
-                            <TextBox Width="40" Margin="20,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsSmall}" KeyDown="TextBox_KeyDown"/>
-                            <TextBox Width="70" Margin="30,0,0,0" Style="{DynamicResource Item}" Text="{Binding Discount}" KeyDown="TextBox_KeyDown"/>
+                            <TextBox Width="30" Margin="15,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsBig, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" GotKeyboardFocus="TextBox_SelectAll" LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            <TextBox Width="40" Margin="20,0,0,0" Style="{DynamicResource Item}" Text="{Binding BedsSmall, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" GotKeyboardFocus="TextBox_SelectAll" LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            <TextBox Width="70" Margin="30,0,0,0" Style="{DynamicResource Item}" Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" GotKeyboardFocus="TextBox_SelectAll" LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -120,7 +108,7 @@
                           VerticalContentAlignment="Center"></ComboBox>
                 <ComboBox Name="cbName"
                           Width="80"
-                          SelectedIndex="1"
+                          SelectedIndex="0"
                           IsTextSearchEnabled="True"
                           Background="#CCFFFFFF"
                           VerticalContentAlignment="Center"></ComboBox>
@@ -128,33 +116,49 @@
                             Margin="0,0,0,0"
                             Width="130"
                             FirstDayOfWeek="Monday"
+                            CalendarStyle="{StaticResource resizedCalendarItem}"
                             SelectedDateChanged="dpCheckIn_SelectedDateChanged"/>
                 <DatePicker Name ="dpCheckOut"
                             Margin="0,0,0,0"
                             Width="130"
+                            CalendarStyle="{StaticResource resizedCalendarItem}"
                             FirstDayOfWeek="Monday"/>
                 <Button Name="btnAdd"
-                        Width="70"
+                        Background="#ccffffff"
                         Click="btnAdd_Click">
-                        Добави
+                        ДОБАВИ
                 </Button>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal" Background="#6BFFE4C4">
-            <Button BorderThickness="0" Click="Delete_Click" Margin="1,0,0,0">
-                <Button.Content>
-                    <TextBlock FontSize="16" Foreground="#FF1F37A4" Margin="10,0,10,0">ИЗТРИЙ</TextBlock>
-                </Button.Content>
-            </Button>
-            <Button BorderThickness="0" Click="Clear_Click" Margin="1,0,0,0">
-                <Button.Content>
-                    <TextBlock FontSize="16" Foreground="#FF1F37A4" Margin="10,0,10,0">ИЗЧИСТИ</TextBlock>
-                </Button.Content>
-            </Button>
+            <Button Click="Delete_Click" Margin="3,0,0,0">ИЗТРИЙ</Button>
+            <Button Click="Clear_Click" Margin="3,0,0,0">ИЗЧИСТИ</Button>
             <TextBlock Name="tester"></TextBlock>
-            <TextBlock Margin="440,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ОБЩА СТОЙНОСТ НА РЕЗЕРВАЦИЯТА:</TextBlock>
-            <TextBlock Name="TbTotal" Margin="10,0,0,0" Style="{StaticResource TotalTextBlockStyle}">0</TextBlock>
-            <TextBlock Margin="5,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ЛВ</TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="420,0,0,0">
+                <TextBlock Style="{StaticResource TotalTextBlockStyle}">ОБЩА СТОЙНОСТ НА РЕЗЕРВАЦИЯТА:</TextBlock>
+                <TextBlock Name="TbTotal" Margin="10,0,0,0" Style="{StaticResource TotalTextBlockStyle}">0</TextBlock>
+                <TextBlock Margin="5,0,0,0" Style="{StaticResource TotalTextBlockStyle}">ЛВ</TextBlock>
+            </StackPanel>
         </StackPanel>
+
+        <Popup
+            Name="PopupWindow"
+            Placement="Relative"
+            PlacementTarget="{Binding ElementName=mainWin}"
+            VerticalOffset="0"
+            HorizontalOffset="0"
+            IsOpen="False"
+            PopupAnimation="Fade"
+            AllowsTransparency="True">
+
+            <!--Without Popup AllowsTransparency="True" CornerRadius leaves black corners-->
+            <Border Background="GhostWhite" BorderBrush="LightSteelBlue" BorderThickness="1,1,1,1" CornerRadius="4,4,4,4">
+                <StackPanel Height="Auto" Width="Auto" Orientation="Vertical">
+                    <StackPanel Name="PopupPanel" Margin="8,5,5,5"/>
+                </StackPanel>
+                
+                
+            </Border>
+        </Popup>
     </Grid>
 </Window>

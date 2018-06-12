@@ -30,7 +30,7 @@ namespace TotalAmount
         {
             InitializeComponent();
             int counter = 0;
-            foreach (var s in mainWindow.seassons)
+            foreach (var s in Settings.seassons)
             {
                 seassons[counter] = s.name;
                 counter++;
@@ -38,16 +38,16 @@ namespace TotalAmount
             seassonNames.ItemsSource = seassons;
             cbSeassonMonth.ItemsSource = months;
             seassonNames.SelectedIndex = 0;
-            doc.Load(App.settingsXml);
+            doc.Load(Settings.settingsFile);
 
             RefreshSeasson();
         }
 
         private void RefreshSeasson()
         {
-            tbSeassonDay.Text = mainWindow.seassons[seassonNames.SelectedIndex].day.ToString();
+            tbSeassonDay.Text = Settings.seassons[seassonNames.SelectedIndex].day.ToString();
             cbSeassonMonth.ItemsSource = months;
-            cbSeassonMonth.SelectedIndex = mainWindow.seassons[seassonNames.SelectedIndex].month - 1;
+            cbSeassonMonth.SelectedIndex = Settings.seassons[seassonNames.SelectedIndex].month - 1;
         }
 
         private void seassonNames_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -60,11 +60,11 @@ namespace TotalAmount
             IEnumerator ie = doc.SelectNodes("/Settings/Date").GetEnumerator();
             while (ie.MoveNext())
             {
-                if ((ie.Current as XmlNode).Attributes["day"].Value == mainWindow.seassons[seassonNames.SelectedIndex].day.ToString() && (ie.Current as XmlNode).Attributes["month"].Value == mainWindow.seassons[seassonNames.SelectedIndex].month.ToString())
+                if ((ie.Current as XmlNode).Attributes["day"].Value == Settings.seassons[seassonNames.SelectedIndex].day.ToString() && (ie.Current as XmlNode).Attributes["month"].Value == Settings.seassons[seassonNames.SelectedIndex].month.ToString())
                 {
                     (ie.Current as XmlNode).Attributes["day"].Value = tbSeassonDay.Text;
                     (ie.Current as XmlNode).Attributes["month"].Value = (cbSeassonMonth.SelectedIndex + 1).ToString();
-                    doc.Save(App.settingsXml);
+                    doc.Save(Settings.settingsFile);
                     
                     MessageBox.Show("Saved");
                     this.Close();

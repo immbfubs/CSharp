@@ -1,0 +1,29 @@
+﻿-.	MainWindow.xaml row 113
+	How to handle empty input
+
+2.	Трябва ли да използвам byte, когато е възможно, за да спестя място?
+	Това увеличава ли времето за изпълнение:
+	- защото при логически и аритметични операции се осъшествява преобразуване?
+	- защото процесорът работи по-бързо с int?
+
+3.	List<object>
+
+4.	Ако попъп е в ъгъла се поллучава премигване
+
+5.	RoomTypes.xaml.cs IEnumerable<> instance?
+
+-.	Delete the quantity property.
+
+7.	Как индексът на редовете да започва от 1?
+
+8.	If Reservation inherits Collection and not ObservableCollection and is 
+	initialized with some items, will ListBox update on Item property change?
+
+9.	Can I use Property changed without declaration for every setter
+
+10. SettingsWindow -> can't bind comboboxes to string[] months from WPF.
+	It is working when cBox#.ItemsSource is set in C#
+
+11. Замазани линии BorderThickness = 1
+
+12.	Handle keyboard date input (date first, not month)

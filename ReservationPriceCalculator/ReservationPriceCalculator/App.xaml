@@ -5,6 +5,16 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+
+        <Color x:Key="DisableDay1">#777777</Color>
+        <Color x:Key="DisableDay2">#444444</Color>
+        <Color x:Key="NormalDay1">LightGray</Color>
+        <Color x:Key="NormalDay2">Gray</Color>
+        <Color x:Key="SelectedDay1">White</Color>
+        <Color x:Key="SelectedDay2">White</Color>
+        <Color x:Key="ToDay1">#ffaced2d</Color>
+        <Color x:Key="ToDay2">#66aced2d</Color>
+        
         <Style TargetType="{x:Type DatePickerTextBox}">
             <Setter Property="Control.Template">
                 <Setter.Value>

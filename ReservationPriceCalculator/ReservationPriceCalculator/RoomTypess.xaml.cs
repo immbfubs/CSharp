@@ -41,7 +41,7 @@ namespace TotalAmount
         public RoomTypes()
         {
             this.DataContext = this;
-            xDoc = XDocument.Load(App.settingsXml);
+            xDoc = XDocument.Load(Settings.settingsFile);
             LoadData();
             InitializeComponent();
             lbRoomTypes.ItemsSource = this.RoomsList;
@@ -61,11 +61,10 @@ namespace TotalAmount
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            xDoc.Save(App.settingsXml);
-            mainWindow.LoadSettingsFile();
-            bool error = mainWindow.LoadRoomTypes();
+            xDoc.Save(Settings.settingsFile);
+            bool error = Settings.ReloadRoomTypes();
             if(!error) tester.Text = "Запазено";
-                else MessageBox.Show("Моля коригирайте въведените данни и натиснете \"Запази\" отново!", "Внимание!");
+                else MessageBox.Show("Моля коригирайте въведените данни и натиснете \"Запази\" отново!\nАко не запазите настройките които виждате, програмата ще остане настроена с цените за 2018г.", "Внимание!");
         }
 
         private void TextBox_GotKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
@@ -81,9 +80,9 @@ namespace TotalAmount
             if(((TextBox)sender).Text != oldValue)
             {
                 DependencyObject stackPanel = VisualTreeHelper.GetParent((DependencyObject)sender);
-                string[] textBoxText = new string[4];
+                string[] textBoxText = new string[5];
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     textBoxText[i] = ((TextBox)VisualTreeHelper.GetChild(stackPanel, i)).Text;
                 }
@@ -93,9 +92,10 @@ namespace TotalAmount
                     if (room.Value == textBoxText[0] || room.Value == oldValue)
                     {
                         room.Value = textBoxText[0];
-                        room.Attribute("out").Value = textBoxText[1];
-                        room.Attribute("low").Value = textBoxText[2];
-                        room.Attribute("high").Value = textBoxText[3];
+						room.Attribute("guests").Value = textBoxText[1];
+						room.Attribute("out").Value = textBoxText[2];
+						room.Attribute("low").Value = textBoxText[3];
+                        room.Attribute("high").Value = textBoxText[4];
                     }
                 }
             }
