@@ -1,0 +1,19 @@
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\bin\Debug\TOTO.exe.config
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\bin\Debug\TOTO.exe
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\bin\Debug\TOTO.pdb
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.csprojResolveAssemblyReference.cache
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.Form1.resources
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.Properties.Resources.resources
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.csproj.GenerateResource.Cache
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.exe
+d:\google drive\documents\visual studio 2015\Projects\TOTO\TOTO\obj\Debug\TOTO.pdb
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\bin\Debug\TOTO.exe.config
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\bin\Debug\TOTO.exe
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\bin\Debug\TOTO.pdb
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.csprojResolveAssemblyReference.cache
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.Form1.resources
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.Properties.Resources.resources
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.csproj.GenerateResource.Cache
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.csproj.CoreCompileInputs.cache
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.exe
+E:\Projects\C#\_MyRELEASES\TOTO\TOTO\obj\Debug\TOTO.pdb

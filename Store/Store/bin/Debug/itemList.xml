@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<items>
+  <item name="тофу" price="1.85" />
+  <item name="домати" price="3.60" />
+  <item name="краставици" price="1.90" />
+  <item name="лук" price="1.20" />
+  <item name="моркови" price="2.60" />
+  <item name="череши" price="4.50" />
+  <item name="минерална вода 1.5л" price="1.30" />
+  <item name="натурален сок" price="2.45" />
+  <item name="хляб" price="0.98" />
+  <item name="яйца 5бр" price="1.75" />
+  <item name="слънчоглед" price="1.15" />
+  <item name="студен чай" price="2.65" />
+  <item name="захар" price="1.30" />
+  <item name="майонеза" price="1.49" />
+  <item name="зехтин" price="6.30" />
+  <item name="бяло вино" price="6.10" />
+</items>

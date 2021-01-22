@@ -1,0 +1,13 @@
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\bin\Debug\netstandard2.0\UndefinedApp.deps.json
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\bin\Debug\netstandard2.0\UndefinedApp.dll
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\bin\Debug\netstandard2.0\ref\UndefinedApp.dll
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\bin\Debug\netstandard2.0\UndefinedApp.pdb
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\UndefinedApp.csprojAssemblyReference.cache
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\App.xaml.g.cs
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\MainPage.xaml.g.cs
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\UndefinedApp.AssemblyInfoInputs.cache
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\UndefinedApp.AssemblyInfo.cs
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\XamlC.stamp
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\UndefinedApp.dll
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\ref\UndefinedApp.dll
+F:\Ivaylo\Dev\C#\_MY\Xamarin\UndefinedApp\UndefinedApp\obj\Debug\netstandard2.0\UndefinedApp.pdb
