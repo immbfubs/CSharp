@@ -1,0 +1,10 @@
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\bin\Release\CommonTools.dll
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\bin\Release\CommonTools.pdb
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.csprojAssemblyReference.cache
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.ColorPickerCtrl.resources
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.ColorPickerDialog.resources
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.ColorWheelCtrl.resources
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.PropertyDialog.resources
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.csproj.GenerateResource.cache
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.dll
+F:\Ivaylo\Dev\C#\_MY\ITRviewer\ITRViewer TreeWithColumn\CommonTools\obj\Release\CommonTools.pdb

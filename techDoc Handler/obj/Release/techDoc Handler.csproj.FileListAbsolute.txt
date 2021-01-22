@@ -1,0 +1,13 @@
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\chromedriver.exe
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\techDoc Handler.exe.config
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\techDoc Handler.exe
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\techDoc Handler.pdb
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\WebDriver.dll
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\bin\Release\WebDriver.xml
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc Handler.csprojAssemblyReference.cache
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc_Handler.Form1.resources
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc_Handler.Properties.Resources.resources
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc Handler.csproj.GenerateResource.cache
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc Handler.csproj.CopyComplete
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc Handler.exe
+F:\Ivaylo\Dev\C#\_MY\techDoc Handler\obj\Release\techDoc Handler.pdb
